@@ -25,7 +25,7 @@ stages:
         subscriptionId: '$(subscriptionId)'
         action: 'Create Or Update Resource Group'
         resourceGroupName: $(resourceGroup)
-        location: 'northeurope'
+        location: '$(location)'
         templateLocation: 'Linked artifact'
         csmFile: '$(Build.SourcesDirectory)/Infrastructure/ARM/Deploy.json'
         deploymentMode: 'Validation'
@@ -63,7 +63,7 @@ stages:
                 subscriptionId: '$(subscriptionId)'
                 action: 'Create Or Update Resource Group'
                 resourceGroupName: $(resourceGroup)
-                location: 'northeurope'
+                location: '$(location)'
                 templateLocation: 'Linked artifact'
                 csmFile: '$(Build.SourcesDirectory)/Infrastructure/ARM/Deploy.json'
                 deploymentMode: 'Incremental'
