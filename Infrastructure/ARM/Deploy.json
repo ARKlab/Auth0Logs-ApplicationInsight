@@ -1,0 +1,340 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "env": {
+            "type": "string",
+            "defaultvalue": "Prod",
+            "allowedValues": [ "Prod", "ARM" ]
+        },
+        "WebSettings": {
+            "type": "object"
+        },
+        "notificationMailingList": {
+            "type": "string"
+        },
+        "company": {
+            "type": "string"
+        },
+        "eventGridTopicName": {
+            "type": "string"
+        },
+        "eventGridSubscriptionName": {
+            "type": "string"
+        },
+        "functionName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "shortName": "auth0toai",
+        "projectName": "Auth0ToApplicationInsight",
+        "storageAccountName": "[concat(toLower(parameters('env')), variables('shortName'), 'sa')]",
+        "applicationInsightsName": "[concat(toLower(parameters('env')), '-', variables('shortName'), '-', 'ai')]",
+        "applicationInsightsAuth0Log": "[concat(toLower(parameters('env')), '-', variables('shortName'), '-', 'aiAuth0Log')]",
+        "grpModelingId": "ee69c2d5-e336-4139-a1bb-02334aaa6aed",
+        "identityName": "[concat(toLower(parameters('env')), '-', variables('shortName'),'-', 'id')]",
+        "notificationMailingList": "[split(parameters('notificationMailingList'), createarray(',',';'))]",
+        "actionGroupName": "notification-group",
+        "identityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName'))]",
+        "auth0ToApplicationInsightFunctionName":"[concat('Fx', '-Connector-', variables('shortName'))]"
+    },
+    "resources": [
+        {
+            "name": "[variables('identityName')]",
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "apiVersion": "2018-11-30",
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "Auth0Log",
+            "dependsOn": [ 
+                "[variables('identityId')]"
+            ],
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "principalId": {
+                            "type": "array",
+                            "minLength": 1
+                        },
+                        "roles": {
+                            "type": "array",
+                            "minLength": 1
+                        }
+                    },
+                    "variables": {
+                        "_roles": {
+                            "Storage Account Contributor": "17d1049b-9a84-46fb-8f53-869881c3d3ab",
+                            "Storage Account Blob Data Reader": "2a2b9908-6ea1-4ae2-8e65-a410df84e7d1",
+                            "Storage Account Blob Data Owner": "b7e6dc6d-f1e8-4753-8033-0f276bb0955b",
+                            "Storage Account Table Contributor": "0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3",
+                            "Storage Account Queue Contributor": "974c5e8b-45b9-4653-ba55-5f855dd0fb88",
+                            "Azure Service Bus Data Owner": "090c5cfd-751d-490a-894a-3ce6f1109419",
+                            "Key Vault Secrets User": "4633458b-17de-408a-b874-0445c86b69e6",
+                            "Key Vault Secrets Officer": "b86a8fe4-44ce-4948-aee5-eccb2c155cd7"
+                        },
+
+                        // we have 2 array [P0, P1, P2] and [R0, R1]
+                        // to make the 'copy' work we have to use a single array, over their combination
+                        // so the total is the mul of the 2 lens (4 principals, 3 roles) = 12
+                        // Pi = mod(i, count-of-Principals=4) => [0,1,2,3,0,1,2,3,0,1,2,3]
+                        // Ri = div(i, count-of-Principals=4) => [0,0,0,0,1,1,1,1,2,2,2,2]  
+                        // which are all the combinations 
+                        "lenPrincipalIds": "[length(parameters('principalId'))]",
+                        "lenRoles": "[length(parameters('roles'))]",
+                        "lenTotal": "[mul(variables('lenPrincipalIds'), variables('lenRoles'))]"
+                    },
+                    "resources": [
+                        {
+                            "copy": {
+                                "count": "[variables('lenTotal')]",
+                                "name": "pairs"
+                            },
+                            "type": "Microsoft.Authorization/roleAssignments",
+                            "apiVersion": "2022-04-01",
+                            "name": "[guid(variables('_roles')[parameters('roles')[div(copyIndex(), variables('lenPrincipalIds'))]], parameters('principalId')[mod(copyIndex(), variables('lenPrincipalIds'))])]",
+                            "properties": {
+                                "principalId": "[parameters('principalId')[mod(copyIndex(), variables('lenPrincipalIds'))]]",
+                                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions',variables('_roles')[parameters('roles')[div(copyIndex(), variables('lenPrincipalIds'))]])]"
+                            }
+                        }
+                    ]
+
+                },
+                "parameters": {
+                    "principalId": {
+                        "value": [
+                            "[reference(variables('identityId')).principalId]",
+                            "[variables('grpModelingId')]"
+                        ]
+                    },
+                    "roles": {
+                        "value": [
+                            "Key Vault Secrets User",
+                            "Storage Account Queue Contributor",
+                            "Storage Account Blob Data Owner",
+                            "Storage Account Contributor",
+                            "Storage Account Table Contributor"
+                        ]
+                    }
+                }
+            }
+        },
+        // Action Groups
+        {
+            "type": "microsoft.insights/actionGroups",
+            "apiVersion": "2019-03-01",
+            "name": "[variables('actionGroupName')]",
+            "location": "global",
+            "properties": {
+                "groupShortName": "[toLower(concat(variables('shortName'), parameters('env')))]",
+                "enabled": true,
+                "copy": [
+                    {
+                        "name": "emailReceivers",
+                        "count": "[length(variables('notificationMailingList'))]",
+                        "input": {
+                            "useCommonAlertSchema": false,
+                            "name": "[variables('notificationMailingList')[copyIndex('emailReceivers')]]",
+                            "emailAddress": "[variables('notificationMailingList')[copyIndex('emailReceivers')]]"
+                        }
+                    }
+                ],
+                "smsReceivers": [],
+                "webhookReceivers": [],
+                "itsmReceivers": [],
+                "azureAppPushReceivers": [],
+                "automationRunbookReceivers": [],
+                "voiceReceivers": [],
+                "logicAppReceivers": [],
+                "azureFunctionReceivers": []
+            }
+        },
+        {
+            "name": "[variables('storageAccountName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2022-05-01",
+            "location": "[variables('location')]",
+            "sku": { "name": "Standard_LRS" },
+            "kind": "StorageV2",
+            "properties": {
+                "isHnsEnabled": true,
+                "isLocalUserEnabled": true,
+                "isSftpEnabled": true
+            }
+        },
+        // {
+        //     "type": "Microsoft.Insights/components",
+        //     "apiVersion": "2020-02-02",
+        //     "name": "[variables('applicationinsightsname')]",
+        //     "location": "[variables('location')]",
+        //     "kind": "web",
+        //     "properties": {
+        //         "Application_Type": "web",
+        //         "WorkspaceResourceId": "[variables('sharedLawId')]"
+        //     }
+        // },
+        {
+            "type": "Microsoft.Insights/components/pricingPlans",
+            "name": "[concat(variables('applicationinsightsname'),'/', 'Basic')]",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2017-10-01",
+            "dependsOn": [
+                "[resourceId('microsoft.insights/components', variables('applicationinsightsname'))]"
+            ],
+            "properties": {
+                "cap": 1,
+                "planType": "Basic",
+                "warningThreshold": 90
+            }
+        },
+        {
+            "name": "[concat(parameters('company'), '-', parameters('env'), '-', variables('projectName'), '-', 'ASP')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2022-03-01",
+            "kind": "functionapp",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "Y1"
+            },
+            "properties": {
+                "reserved": false
+            }
+        },
+        // Azure function app
+        {  
+            "name": "[variables('auth0ToApplicationInsightFunctionName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2022-03-01",
+            "location": "[variables('location')]",
+            "kind": "functionapp",
+            "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": { "[variables('identityId')]": {} }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', concat(parameters('company'), '-', parameters('env'), '-', variables('projectName'), '-', 'ASP'))]",
+                "[variables('identityId')]"
+            ],
+            "properties": {
+                "reserved": false,
+                "name": "[variables('auth0ToApplicationInsightFunctionName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', concat(parameters('company'), '-', parameters('env'), '-', variables('projectName'), '-', 'ASP'))]", 
+                "siteConfig": {
+                    "numberOfWorkers": 1,
+                    //"httpLoggingEnabled": true,
+                    "http20Enabled": false,
+                    //"linuxFxVersion":  "DOTNET|6.0",
+                    "alwaysOn": false
+                },
+                "httpsOnly": true,
+                
+                "keyVaultReferenceIdentity": "[variables('identityId')]"
+            },
+            "resources": [
+                {
+                    "name": "appsettings",
+                    "type": "config",
+                    "apiVersion": "2022-03-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', variables('auth0ToApplicationInsightFunctionName'))]"
+                    ],
+                    "properties": {
+                        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components', variables('applicationInsightsName')), '2020-02-02-preview').InstrumentationKey]",
+                        "APPLICATIONINSIGHTS_CONNECTION_STRING": "[reference(resourceId('microsoft.insights/components', variables('applicationInsightsName')), '2020-02-02-preview').ConnectionString]",
+                        "AUTH0_INSTRUMENTATION_KEY": "[reference(resourceId('microsoft.insights/components', variables('applicationInsightsAuth0Log')), '2020-02-02-preview').InstrumentationKey]",
+                        
+                        "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('WebSettings').storageAccount.name,';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('WebSettings').storageAccount.name), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
+                                                //"DefaultEndpointsProtocol=https;AccountName=auth0logsa8c8;AccountKey=6H+k/pkeyjt2+bqobedatpq7zMz1GbtUAIcWV4yW0YGfEeZbfLL0jB0BBkh7qNgLKUk722gvIkWS+ASt9MHftg==;EndpointSuffix=core.windows.net",
+                                                //"[concat('DefaultEndpointsProtocol=https;AccountName=',variables('StorageAccount'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('StorageAccount')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
+                        "FUNCTIONS_EXTENSION_VERSION": "~4",
+                        "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+
+                        "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('WebSettings').storageAccount.name,';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('WebSettings').storageAccount.name), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
+                                                                    //"DefaultEndpointsProtocol=https;AccountName=auth0logsa8c8;AccountKey=6H+k/pkeyjt2+bqobedatpq7zMz1GbtUAIcWV4yW0YGfEeZbfLL0jB0BBkh7qNgLKUk722gvIkWS+ASt9MHftg==;EndpointSuffix=core.windows.net",
+                        "WEBSITE_CONTENTSHARE": "[concat(variables('auth0ToApplicationInsightFunctionName'), '-', parameters('env'), '-', variables('projectName'))]",// "auth0logeventgrida63a",
+                        
+                        "WEBSITE_RUN_FROM_PACKAGE": "1"
+                    }
+                },                
+                {
+                    "type": "config",
+                    "apiVersion": "2022-03-01",
+                    "name": "logs",
+                    "properties": {
+                        "applicationLogs": {
+                            "fileSystem": {
+                                "level": "Warning"
+                            }
+                            },
+                            "httpLogs": {
+                            "fileSystem": {
+                                "retentionInMb": 40,
+                                "enabled": true
+                            }
+                        },
+                        "failedRequestsTracing": {
+                        "enabled": true
+                        },
+                        "detailedErrorMessages": {
+                        "enabled": true
+                        }
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', variables('auth0ToApplicationInsightFunctionName'))]"
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.EventGrid/eventSubscriptions",
+            "apiVersion": "2020-06-01",
+            //"scope": "[format('Microsoft.EventGrid/topics/{0}', parameters('eventGridTopicName'))]",
+            "name": "[parameters('eventGridSubscriptionName')]",
+            "properties": {
+                "topic": "[concat('/subscriptions/', subscription().tenantId,'/resourceGroups/', resourceGroup().name,'/providers/Microsoft.EventGrid/partnerTopics/', parameters('eventGridTopicName'))]",
+                        //"/subscriptions/4d02c00f-2f0b-4eda-8a58-9a42594c8a1f/resourceGroups/Auth0-Logs/providers/Microsoft.EventGrid/partnerTopics/auth0-axpoit-P-BK1VpOIA",
+		        "destination": {
+                    "endpointType": "AzureFunction",
+                    "properties": {
+                        //"resourceId": "/subscriptions/4d02c00f-2f0b-4eda-8a58-9a42594c8a1f/resourceGroups/Auth0-Logs/providers/Microsoft.Web/sites/Auth0LogEventGrid/functions/EventTriggerFunction",
+				        "resourceId": "[resourceId('Microsoft.Web/sites/', variables('auth0ToApplicationInsightFunctionName'),'functions/', parameters('functionName'))]",
+                        "maxEventsPerBatch": 1,
+				        "preferredBatchSizeInKilobytes": 64
+                    }
+                },
+            "filter": {
+                "advancedFilters": [],
+                "enableAdvancedFilteringOnArrays": true
+            },
+            "labels": [],
+            "eventDeliverySchema": "CloudEventSchemaV1_0"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.EventGrid/topics', parameters('eventGridTopicName'))]"
+            ]
+        }
+    ],
+    "outputs": {
+        "identityName": {
+            "type": "string",
+            "value": "[variables('identityName')]"
+
+        },
+        "forecastGasSchedulerFunctionName": {
+            "type": "string",
+            "value": "[variables('auth0ToApplicationInsightFunctionName')]"
+
+        }
+    }
+}

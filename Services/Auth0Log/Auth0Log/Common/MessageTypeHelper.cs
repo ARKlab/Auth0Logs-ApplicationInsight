@@ -1,7 +1,7 @@
 ﻿using System;
-using static Auth0EventGridHttpFunction.Common.MessageTypeHelper;
+using static Auth0LogEventGridFunction.Common.MessageTypeHelper;
 
-namespace Auth0EventGridHttpFunction.Common
+namespace Auth0LogEventGridFunction.Common
 {
     public static class MessageTypeHelper
     {
@@ -27,6 +27,8 @@ namespace Auth0EventGridHttpFunction.Common
             {
                 case "s":
                     return new LogType("Success Login", LogLevel.Debug_messages);
+                case "slo":
+                    return new LogType("Success Logout", LogLevel.Debug_messages);
                 case "seccft":
                     return new LogType("Success Exchange", LogLevel.Debug_messages);
                 case "seacft":
@@ -35,6 +37,8 @@ namespace Auth0EventGridHttpFunction.Common
                     return new LogType("Success Exchange", LogLevel.Debug_messages);
                 case "ssa":
                     return new LogType("Success Silent Auth", LogLevel.Debug_messages);
+                case "mgmt_api_read":
+                    return new LogType("Management API read Operation", LogLevel.Debug_messages);
                 case "feacft":
                     return new LogType("Failed Exchange", LogLevel.Errors);
                 case "fercft":

@@ -5,20 +5,23 @@ using Newtonsoft.Json;
 using Azure.Messaging;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.ApplicationInsights;
-using NLog;
-using Auth0EventGridHttpFunction.Common;
+using Auth0LogEventGridFunction.Common;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Configuration;
+using Microsoft.ApplicationInsights.Extensibility;
 
 namespace Auth0EventGridFunction
 {
     public class EventTriggerFunction
     {
         private TelemetryClient appInsights;
+        private IConfiguration _config;
 
-        public EventTriggerFunction(TelemetryClient telemetry) 
+        public EventTriggerFunction(IConfiguration config) 
         {
-            appInsights = telemetry;
+            _config = config;
+            appInsights = new TelemetryClient(new TelemetryConfiguration(_config["AUTH0_INSTRUMENTATION_KEY"]));
         }
 
         [FunctionName("EventTriggerFunction")]
