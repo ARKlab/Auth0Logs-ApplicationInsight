@@ -255,13 +255,10 @@
                         "AUTH0_INSTRUMENTATION_KEY": "[reference(resourceId('microsoft.insights/components', variables('applicationInsightsAuth0Log')), '2020-02-02-preview').InstrumentationKey]",
                         
                         "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('WebSettings').storageAccount.name,';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('WebSettings').storageAccount.name), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
-                                                //"DefaultEndpointsProtocol=https;AccountName=auth0logsa8c8;AccountKey=6H+k/pkeyjt2+bqobedatpq7zMz1GbtUAIcWV4yW0YGfEeZbfLL0jB0BBkh7qNgLKUk722gvIkWS+ASt9MHftg==;EndpointSuffix=core.windows.net",
-                                                //"[concat('DefaultEndpointsProtocol=https;AccountName=',variables('StorageAccount'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('StorageAccount')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
                         "FUNCTIONS_EXTENSION_VERSION": "~4",
                         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
 
                         "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('WebSettings').storageAccount.name,';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('WebSettings').storageAccount.name), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
-                                                                    //"DefaultEndpointsProtocol=https;AccountName=auth0logsa8c8;AccountKey=6H+k/pkeyjt2+bqobedatpq7zMz1GbtUAIcWV4yW0YGfEeZbfLL0jB0BBkh7qNgLKUk722gvIkWS+ASt9MHftg==;EndpointSuffix=core.windows.net",
                         "WEBSITE_CONTENTSHARE": "[concat(variables('auth0ToApplicationInsightFunctionName'), '-', parameters('env'), '-', variables('projectName'))]",// "auth0logeventgrida63a",
                         
                         "WEBSITE_RUN_FROM_PACKAGE": "1"
@@ -299,15 +296,12 @@
         {
             "type": "Microsoft.EventGrid/eventSubscriptions",
             "apiVersion": "2020-06-01",
-            //"scope": "[format('Microsoft.EventGrid/topics/{0}', parameters('eventGridTopicName'))]",
             "name": "[parameters('eventGridSubscriptionName')]",
             "properties": {
                 "topic": "[concat('/subscriptions/', subscription().tenantId,'/resourceGroups/', resourceGroup().name,'/providers/Microsoft.EventGrid/partnerTopics/', parameters('eventGridTopicName'))]",
-                        //"/subscriptions/4d02c00f-2f0b-4eda-8a58-9a42594c8a1f/resourceGroups/Auth0-Logs/providers/Microsoft.EventGrid/partnerTopics/auth0-axpoit-P-BK1VpOIA",
 		        "destination": {
                     "endpointType": "AzureFunction",
                     "properties": {
-                        //"resourceId": "/subscriptions/4d02c00f-2f0b-4eda-8a58-9a42594c8a1f/resourceGroups/Auth0-Logs/providers/Microsoft.Web/sites/Auth0LogEventGrid/functions/EventTriggerFunction",
 				        "resourceId": "[resourceId('Microsoft.Web/sites/', variables('auth0ToApplicationInsightFunctionName'),'functions/', parameters('functionName'))]",
                         "maxEventsPerBatch": 1,
 				        "preferredBatchSizeInKilobytes": 64
