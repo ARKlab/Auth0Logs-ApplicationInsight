@@ -131,6 +131,31 @@
             }
         },
         {
+            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(variables('auth0ToApplicationInsightFunctionName'), '-', variables('projectName'))]",
+             "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ]
+            // "properties": {
+            //     "accessTier": "TransactionOptimized",
+            //     "enabledProtocols": "string",
+            //     "metadata": {},
+            //     "rootSquash": "string",
+            //     "shareQuota": "int",
+            //     "signedIdentifiers": [
+            //     {
+            //         "accessPolicy": {
+            //         "expiryTime": "string",
+            //         "permission": "string",
+            //         "startTime": "string"
+            //         },
+            //         "id": "string"
+            //     }
+            //     ]
+            // }
+            },
+        {
             "type": "Microsoft.Insights/components",
             "apiVersion": "2020-02-02",
             "name": "[variables('applicationinsightsname')]",
