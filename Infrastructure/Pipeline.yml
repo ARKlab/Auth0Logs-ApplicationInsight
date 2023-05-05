@@ -14,10 +14,6 @@ stages:
   - job: 'Build_Job' #Job name cannot have spaces
     displayName: 'ARM Validation' #Name displayed when viewing in Azure DevOps
     variables:
-        resourceGroup: '$(resourceGroup)' 
-        subscription: '$(subscription)'
-        subscriptionId: '$(subscriptionId)'
-        deploymentName: 'Auth0ToApplicationInsight'
     - group: Auth0ToApplicationInsight
     pool:
       vmImage: 'windows-2022'
