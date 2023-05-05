@@ -20,16 +20,16 @@ stages:
     steps:
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
-        # deploymentScope: 'Resource Group'
-        # azureResourceManagerConnection: '$(subscription)'
+        deploymentScope: 'Resource Group'
+        azureResourceManagerConnection: '${{ variables.subscription }}'
         # subscriptionId: '$(subscriptionId)'
-        # action: 'Create Or Update Resource Group'
+        action: 'Create Or Update Resource Group'
         resourceGroupName: $(resourceGroup)
-        # location: '$(location)'
-        # templateLocation: 'Linked artifact'
-        # csmFile: '$(Build.SourcesDirectory)/Infrastructure/ARM/Deploy.json'
-        # deploymentMode: 'Validation'
-        # deploymentName: 'Auth0ToApplicationInsight'
+        location: '$(location)'
+        templateLocation: 'Linked artifact'
+        csmFile: '$(Build.SourcesDirectory)/Infrastructure/ARM/Deploy.json'
+        deploymentMode: 'Validation'
+        deploymentName: 'Auth0ToApplicationInsight'
         # auth0LogConnectionString: $auth0LogConnectionString
         # company: $(company)
         # eventGridTopicName: $(eventGridTopicName)
@@ -37,6 +37,7 @@ stages:
         overrideParameters: >-
           -company $(company) -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) 
           -functionName $(functionName)  -auth0LogConnectionString $(auth0LogConnectionString) -subscription $(subscription)
+          -subscriptionId $(subscriptionId)
 - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
 #- ${{ if true }}:
   - stage: 'Stage' #Stage name cannot have spaces
@@ -62,16 +63,16 @@ stages:
             - checkout: self
             - task: AzureResourceManagerTemplateDeployment@3
               inputs:
-                # deploymentScope: 'Resource Group'
-                # azureResourceManagerConnection: '${{ variables.subscription }}'
+                deploymentScope: 'Resource Group'
+                azureResourceManagerConnection: '${{ variables.subscription }}'
                 # subscriptionId: '$(subscriptionId)'
-                # action: 'Create Or Update Resource Group'
+                action: 'Create Or Update Resource Group'
                 resourceGroupName: $(resourceGroup)
-                # location: '$(location)'
-                # templateLocation: 'Linked artifact'
-                # csmFile: '$(Build.SourcesDirectory)/Infrastructure/ARM/Deploy.json'
-                # deploymentMode: 'Incremental'
-                # deploymentName: '$(deploymentName)'
+                location: '$(location)'
+                templateLocation: 'Linked artifact'
+                csmFile: '$(Build.SourcesDirectory)/Infrastructure/ARM/Deploy.json'
+                deploymentMode: 'Incremental'
+                deploymentName: '$(deploymentName)'
                 # auth0LogConnectionString: $auth0LogConnectionString
                 # company: $(company)
                 # eventGridTopicName: $(eventGridTopicName)
@@ -79,4 +80,5 @@ stages:
                 overrideParameters: >-
                   -company $(company) -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) 
                   -functionName $(functionName)  -auth0LogConnectionString $(auth0LogConnectionString) -subscription $(subscription)
+                  -subscriptionId $(subscriptionId)
 
