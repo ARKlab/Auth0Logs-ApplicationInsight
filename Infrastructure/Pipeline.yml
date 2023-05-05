@@ -2,8 +2,8 @@ trigger:
   batch: true
   branches:
     include:
-    # - master
-    - feature/13409-Auth0ToApplicationInsight
+    - master
+    # - feature/13409-Auth0ToApplicationInsight
   paths:
     include:
     - Infrastructure
