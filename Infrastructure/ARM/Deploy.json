@@ -269,7 +269,7 @@
             "eventDeliverySchema": "CloudEventSchemaV1_0"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.EventGrid/topics', parameters('eventGridTopicName'))]"
+                "[resourceId('Microsoft.EventGrid/partnerTopics', parameters('eventGridTopicName'))]"
             ]
         }
     ],
