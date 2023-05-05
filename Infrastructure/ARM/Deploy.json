@@ -22,9 +22,9 @@
     "location": "[resourceGroup().location]",
     "shortName": "auth0toai",
     "projectName": "Auth0ToApplicationInsight",
-    "storageAccountName": "[concat('prod', '-', variables('shortName'), '-', 'sa')]",
-    "applicationInsightsName": "[concat('prod', '-', variables('shortName'), '-', 'ai')]",
-    "identityName": "[concat('prod', '-', variables('shortName'),'-', 'id')]",
+    "storageAccountName": "[concat(variables('shortName'), '-', 'sa')]",
+    "applicationInsightsName": "[concat(variables('shortName'), '-', 'ai')]",
+    "identityName": "[concat(variables('shortName'),'-', 'id')]",
     "identityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName'))]",
     "auth0ToApplicationInsightFunctionName": "[concat('Fx', '-Connector-', variables('shortName'))]"
   },
@@ -130,17 +130,17 @@
                 "isSftpEnabled": true
             }
         },
-        // {
-        //     "type": "Microsoft.Insights/components",
-        //     "apiVersion": "2020-02-02",
-        //     "name": "[variables('applicationinsightsname')]",
-        //     "location": "[variables('location')]",
-        //     "kind": "web",
-        //     "properties": {
-        //         "Application_Type": "web",
-        //         "WorkspaceResourceId": "[variables('sharedLawId')]"
-        //     }
-        // },
+        {
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2020-02-02",
+            "name": "[variables('applicationinsightsname')]",
+            "location": "[variables('location')]",
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web"//,
+                //"WorkspaceResourceId": "[variables('sharedLawId')]"
+            }
+        },
         {
             "type": "Microsoft.Insights/components/pricingPlans",
             "name": "[concat(variables('applicationinsightsname'),'/', 'Basic')]",
@@ -156,7 +156,7 @@
             }
         },
       {
-        "name": "[concat(parameters('company'), '-', 'prod', '-', variables('projectName'), '-', 'ASP')]",
+        "name": "[concat(parameters('company'), '-', variables('projectName'), '-', 'ASP')]",
         "type": "Microsoft.Web/serverfarms",
         "apiVersion": "2022-03-01",
         "kind": "functionapp",
@@ -180,13 +180,13 @@
                 "userAssignedIdentities": { "[variables('identityId')]": {} }
             },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/serverfarms', concat(parameters('company'), '-', 'prod', '-', variables('projectName'), '-', 'ASP'))]",
+            "[resourceId('Microsoft.Web/serverfarms', concat(parameters('company'), '-', variables('projectName'), '-', 'ASP'))]",
             "[variables('identityId')]"
           ],
           "properties": {
             "reserved": false,
             "name": "[variables('auth0ToApplicationInsightFunctionName')]",
-            "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', concat(parameters('company'), '-', 'prod', '-', variables('projectName'), '-', 'ASP'))]",
+            "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', concat(parameters('company'), '-', variables('projectName'), '-', 'ASP'))]",
             "siteConfig": {
               "numberOfWorkers": 1,
               //"httpLoggingEnabled": true,
@@ -214,7 +214,7 @@
                     "FUNCTIONS_EXTENSION_VERSION": "~4",
                     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
                     "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
-                    "WEBSITE_CONTENTSHARE": "[concat(variables('auth0ToApplicationInsightFunctionName'), '-', 'prod', '-', variables('projectName'))]", // "auth0logeventgrida63a",
+                    "WEBSITE_CONTENTSHARE": "[concat(variables('auth0ToApplicationInsightFunctionName'), '-', variables('projectName'))]", // "auth0logeventgrida63a",
                     "WEBSITE_RUN_FROM_PACKAGE": "1"
                   }
                 },                
