@@ -272,31 +272,32 @@
                 }
             ]
         },
-        {
-            "type": "Microsoft.EventGrid/eventSubscriptions",
-            "apiVersion": "2020-06-01",
-            "name": "[parameters('eventGridSubscriptionName')]",
-            "properties": {
-                "topic": "[concat('/subscriptions/', subscription().tenantId,'/resourceGroups/', resourceGroup().name,'/providers/Microsoft.EventGrid/partnerTopics/', parameters('eventGridTopicName'))]",
-		        "destination": {
-                    "endpointType": "AzureFunction",
-                    "properties": {
- 				        "resourceId": "[resourceId('Microsoft.Web/sites/', variables('auth0ToApplicationInsightFunctionName'),'functions/', parameters('functionName'))]",
-                        "maxEventsPerBatch": 1,
-				        "preferredBatchSizeInKilobytes": 64
-                    }
-                },
-            "filter": {
-                "advancedFilters": [],
-                "enableAdvancedFilteringOnArrays": true
-            },
-            "labels": [],
-            "eventDeliverySchema": "CloudEventSchemaV1_0"
-            }//,
-            // "dependsOn": [
-            //     "[resourceId('Microsoft.EventGrid/partnerTopics', parameters('eventGridTopicName'))]"
-            // ]
-        }
+        // {
+        //     "type": "Microsoft.EventGrid/eventSubscriptions",
+        //     "apiVersion": "2020-06-01",
+        //     "name": "[parameters('eventGridSubscriptionName')]",
+        //     "properties": {
+        //         "topic": "[concat('/subscriptions/', subscription().tenantId,'/resourceGroups/', resourceGroup().name,'/providers/Microsoft.EventGrid/partnerTopics/', parameters('eventGridTopicName'))]",
+		//         "destination": {
+        //             "endpointType": "AzureFunction",
+        //             "properties": {
+ 		// 		        "resourceId": "[resourceId('Microsoft.Web/sites/', variables('auth0ToApplicationInsightFunctionName'),'functions/', parameters('functionName'))]",
+        //                 "maxEventsPerBatch": 1,
+		// 		        "preferredBatchSizeInKilobytes": 64
+        //             }
+        //         },
+        //     "filter": {
+        //         "advancedFilters": [],
+        //         "enableAdvancedFilteringOnArrays": true
+        //     },
+        //     "labels": [],
+        //     "eventDeliverySchema": "CloudEventSchemaV1_0"
+        //     }
+        //     //,
+        //     // "dependsOn": [
+        //     //     "[resourceId('Microsoft.EventGrid/partnerTopics', parameters('eventGridTopicName'))]"
+        //     // ]
+        // }
     ],
   "outputs": {
     "identityName": {
