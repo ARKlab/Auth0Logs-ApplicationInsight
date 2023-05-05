@@ -133,7 +133,7 @@
         {
             "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
             "apiVersion": "2022-09-01",
-            "name": "[concat(variables('shortName'), variables('projectName'))]",
+            "name": "[concat(variables('shortName'), 'sha')]",
              "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
             ]
