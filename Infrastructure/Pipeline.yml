@@ -34,7 +34,6 @@ stages:
         company: $(company)
         eventGridTopicName: $(eventGridTopicName)
         eventGridSubscriptionName: $(eventGridSubscriptionName)
-        eventGridSubscriptionName: $(eventGridSubscriptionName)
 
 - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
 #- ${{ if true }}:
@@ -74,6 +73,5 @@ stages:
                 auth0LogConnectionString: $auth0LogConnectionString
                 company: $(company)
                 eventGridTopicName: $(eventGridTopicName)
-                eventGridSubscriptionName: $(eventGridSubscriptionName)
                 eventGridSubscriptionName: $(eventGridSubscriptionName)
 
