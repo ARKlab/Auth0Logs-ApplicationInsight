@@ -267,10 +267,10 @@
             },
             "labels": [],
             "eventDeliverySchema": "CloudEventSchemaV1_0"
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.EventGrid/partnerTopics', parameters('eventGridTopicName'))]"
-            ]
+            }//,
+            // "dependsOn": [
+            //     "[resourceId('Microsoft.EventGrid/partnerTopics', parameters('eventGridTopicName'))]"
+            // ]
         }
     ],
   "outputs": {
