@@ -54,7 +54,7 @@ stages:
         deploymentName: 'Auth0ToApplicationInsight'
       pool:
         vmImage: 'windows-2022'
-      environment: '$(resourceGroup)' 
+      environment: Auth0ToApplicationInsight
       strategy:
         runOnce:
           deploy:
