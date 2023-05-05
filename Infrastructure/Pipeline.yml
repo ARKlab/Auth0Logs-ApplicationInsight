@@ -37,12 +37,13 @@ stages:
         overrideParameters: >-
           -company $(company) -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) 
           -functionName $(functionName)  -auth0LogConnectionString $(auth0LogConnectionString)
+
 #- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
-- ${{ if true }}:
   - stage: 'Stage' #Stage name cannot have spaces
     dependsOn:
       - Build_Stage
     displayName: 'Infrastructure' #Name displayed when viewing in Azure DevOps
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     variables:
     - group: Auth0ToApplicationInsight
     jobs:
@@ -63,20 +64,15 @@ stages:
             - task: AzureResourceManagerTemplateDeployment@3
               inputs:
                 deploymentScope: 'Resource Group'
-                azureResourceManagerConnection: '$(subscription)'
-                subscriptionId: '$(subscriptionId)'
+                azureResourceManagerConnection: '${{ variables.subscription }}'
+                subscriptionId: $(subscriptionId)
                 action: 'Create Or Update Resource Group'
                 resourceGroupName: $(resourceGroup)
-                location: '$(location)'
+                location: $(location)
                 templateLocation: 'Linked artifact'
                 csmFile: '$(Build.SourcesDirectory)/Infrastructure/ARM/Deploy.json'
                 deploymentMode: 'Incremental'
                 deploymentName: '$(deploymentName)'
-                # auth0LogConnectionString: $auth0LogConnectionString
-                # company: $(company)
-                # eventGridTopicName: $(eventGridTopicName)
-                # eventGridSubscriptionName: $(eventGridSubscriptionName)
-                overrideParameters: >-
+                overrideParameters:  >-
                   -company $(company) -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) 
                   -functionName $(functionName)  -auth0LogConnectionString $(auth0LogConnectionString)
-
