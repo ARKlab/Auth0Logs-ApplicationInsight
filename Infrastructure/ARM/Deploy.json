@@ -22,7 +22,7 @@
     "location": "[resourceGroup().location]",
     "shortName": "auth0toai",
     "projectName": "Auth0ToApplicationInsight",
-    "storageAccountName": "[concat(variables('shortName'), '-', 'sa')]",
+    "storageAccountName": "[concat(variables('shortName'), 'sa')]",
     "applicationInsightsName": "[concat(variables('shortName'), '-', 'ai')]",
     "identityName": "[concat(variables('shortName'),'-', 'id')]",
     "identityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName'))]",
