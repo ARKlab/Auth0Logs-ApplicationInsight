@@ -21,8 +21,8 @@ stages:
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
         deploymentScope: 'Resource Group'
-        azureResourceManagerConnection: '${{ variables.subscription }}'
-        subscriptionId: '${{ variables.subscriptionId }}'
+        azureResourceManagerConnection: '$(subscription)'
+        subscriptionId: '$(subscriptionId)'
         action: 'Create Or Update Resource Group'
         resourceGroupName: $(resourceGroup)
         location: '$(location)'
@@ -64,8 +64,8 @@ stages:
             - task: AzureResourceManagerTemplateDeployment@3
               inputs:
                 deploymentScope: 'Resource Group'
-                azureResourceManagerConnection: '${{ variables.subscription }}'
-                subscriptionId: '${{ variables.subscriptionId }}'
+                azureResourceManagerConnection: '$(subscription)'
+                subscriptionId: '$(subscriptionId)'
                 action: 'Create Or Update Resource Group'
                 resourceGroupName: $(resourceGroup)
                 location: '$(location)'
