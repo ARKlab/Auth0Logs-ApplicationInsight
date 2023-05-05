@@ -20,20 +20,20 @@ stages:
     steps:
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
-        deploymentScope: 'Resource Group'
-        azureResourceManagerConnection: '$(subscription)'
-        subscriptionId: '$(subscriptionId)'
-        action: 'Create Or Update Resource Group'
+        # deploymentScope: 'Resource Group'
+        # azureResourceManagerConnection: '$(subscription)'
+        # subscriptionId: '$(subscriptionId)'
+        # action: 'Create Or Update Resource Group'
         resourceGroupName: $(resourceGroup)
-        location: '$(location)'
-        templateLocation: 'Linked artifact'
-        csmFile: '$(Build.SourcesDirectory)/Infrastructure/ARM/Deploy.json'
-        deploymentMode: 'Validation'
-        deploymentName: 'Auth0ToApplicationInsight'
-        auth0LogConnectionString: $auth0LogConnectionString
-        company: $(company)
-        eventGridTopicName: $(eventGridTopicName)
-        eventGridSubscriptionName: $(eventGridSubscriptionName)
+        # location: '$(location)'
+        # templateLocation: 'Linked artifact'
+        # csmFile: '$(Build.SourcesDirectory)/Infrastructure/ARM/Deploy.json'
+        # deploymentMode: 'Validation'
+        # deploymentName: 'Auth0ToApplicationInsight'
+        # auth0LogConnectionString: $auth0LogConnectionString
+        # company: $(company)
+        # eventGridTopicName: $(eventGridTopicName)
+        # eventGridSubscriptionName: $(eventGridSubscriptionName)
         overrideParameters: >-
           -company $(company) -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) 
           -functionName $(functionName)  -auth0LogConnectionString $(auth0LogConnectionString) -subscription $(subscription)
@@ -62,20 +62,20 @@ stages:
             - checkout: self
             - task: AzureResourceManagerTemplateDeployment@3
               inputs:
-                deploymentScope: 'Resource Group'
-                azureResourceManagerConnection: '${{ variables.subscription }}'
-                subscriptionId: '$(subscriptionId)'
-                action: 'Create Or Update Resource Group'
+                # deploymentScope: 'Resource Group'
+                # azureResourceManagerConnection: '${{ variables.subscription }}'
+                # subscriptionId: '$(subscriptionId)'
+                # action: 'Create Or Update Resource Group'
                 resourceGroupName: $(resourceGroup)
-                location: '$(location)'
-                templateLocation: 'Linked artifact'
-                csmFile: '$(Build.SourcesDirectory)/Infrastructure/ARM/Deploy.json'
-                deploymentMode: 'Incremental'
-                deploymentName: '$(deploymentName)'
-                auth0LogConnectionString: $auth0LogConnectionString
-                company: $(company)
-                eventGridTopicName: $(eventGridTopicName)
-                eventGridSubscriptionName: $(eventGridSubscriptionName)
+                # location: '$(location)'
+                # templateLocation: 'Linked artifact'
+                # csmFile: '$(Build.SourcesDirectory)/Infrastructure/ARM/Deploy.json'
+                # deploymentMode: 'Incremental'
+                # deploymentName: '$(deploymentName)'
+                # auth0LogConnectionString: $auth0LogConnectionString
+                # company: $(company)
+                # eventGridTopicName: $(eventGridTopicName)
+                # eventGridSubscriptionName: $(eventGridSubscriptionName)
                 overrideParameters: >-
                   -company $(company) -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) 
                   -functionName $(functionName)  -auth0LogConnectionString $(auth0LogConnectionString) -subscription $(subscription)
