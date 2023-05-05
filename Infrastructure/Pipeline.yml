@@ -21,8 +21,8 @@ stages:
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
         deploymentScope: 'Resource Group'
-        azureResourceManagerConnection: '$(subscription)'
-        subscriptionId: '$(subscriptionId)'
+        azureResourceManagerConnection: '${{ variables.subscription }}'
+        subscriptionId: '${{ variables.subscriptionId }}'
         action: 'Create Or Update Resource Group'
         resourceGroupName: $(resourceGroup)
         location: '$(location)'
@@ -52,7 +52,6 @@ stages:
       variables:
         resourceGroup: '$(resourceGroup)' 
         subscription: '$(subscription)'
-        subscriptionId: '$(subscriptionId)'
         deploymentName: 'Auth0ToApplicationInsight'
       pool:
         vmImage: 'windows-2022'
@@ -65,8 +64,8 @@ stages:
             - task: AzureResourceManagerTemplateDeployment@3
               inputs:
                 deploymentScope: 'Resource Group'
-                azureResourceManagerConnection: '$(subscription)'
-                subscriptionId: '$(subscriptionId)'
+                azureResourceManagerConnection: '${{ variables.subscription }}'
+                subscriptionId: '${{ variables.subscriptionId }}'
                 action: 'Create Or Update Resource Group'
                 resourceGroupName: $(resourceGroup)
                 location: '$(location)'
