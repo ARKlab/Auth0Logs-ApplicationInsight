@@ -14,6 +14,10 @@ stages:
   - job: 'Build_Job' #Job name cannot have spaces
     displayName: 'ARM Validation' #Name displayed when viewing in Azure DevOps
     variables:
+        resourceGroup: '$(resourceGroup)' 
+        subscription: '$(subscription)'
+        subscriptionId: '$(subscriptionId)'
+        deploymentName: 'Auth0ToApplicationInsight'
     - group: Auth0ToApplicationInsight
     pool:
       vmImage: 'windows-2022'
@@ -21,8 +25,8 @@ stages:
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
         deploymentScope: 'Resource Group'
-        azureResourceManagerConnection: '${{ variables.subscription }}'
-        subscriptionId: '${{ variables.subscriptionId }}'
+        azureResourceManagerConnection: '$(subscription)'
+        subscriptionId: '$(subscriptionId)'
         action: 'Create Or Update Resource Group'
         resourceGroupName: $(resourceGroup)
         location: '$(location)'
@@ -52,6 +56,7 @@ stages:
       variables:
         resourceGroup: '$(resourceGroup)' 
         subscription: '$(subscription)'
+        subscriptionId: '$(subscriptionId)'
         deploymentName: 'Auth0ToApplicationInsight'
       pool:
         vmImage: 'windows-2022'
@@ -64,8 +69,8 @@ stages:
             - task: AzureResourceManagerTemplateDeployment@3
               inputs:
                 deploymentScope: 'Resource Group'
-                azureResourceManagerConnection: '${{ variables.subscription }}'
-                subscriptionId: '${{ variables.subscriptionId }}'
+                azureResourceManagerConnection: '$(subscription)'
+                subscriptionId: '$(subscriptionId)'
                 action: 'Create Or Update Resource Group'
                 resourceGroupName: $(resourceGroup)
                 location: '$(location)'
