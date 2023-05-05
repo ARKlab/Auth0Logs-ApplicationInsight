@@ -37,8 +37,8 @@ stages:
         overrideParameters: >-
           -company $(company) -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) 
           -functionName $(functionName)  -auth0LogConnectionString $(auth0LogConnectionString)
-- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
-#- ${{ if true }}:
+#- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
+- ${{ if true }}:
   - stage: 'Stage' #Stage name cannot have spaces
     dependsOn:
       - Build_Stage
