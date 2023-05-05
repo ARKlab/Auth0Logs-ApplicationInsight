@@ -43,7 +43,7 @@ stages:
   dependsOn:
     - Build_Stage
   displayName: 'Infrastructure' #Name displayed when viewing in Azure DevOps
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+  #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   variables:
   - group: Auth0ToApplicationInsight
   jobs:
