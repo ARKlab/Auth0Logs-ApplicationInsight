@@ -50,10 +50,6 @@ stages:
   jobs:
   - deployment: 'Deploy' #Job name cannot have spaces
     displayName: 'Infrastructure' #Name displayed when viewing in Azure DevOps
-    variables:
-      resourceGroup: 'Auth0-Logs' 
-      subscription: 'AXPI SaaS(4d02c00f-2f0b-4eda-8a58-9a42594c8a1f)'
-      deploymentName: 'Auth0ToApplicationInsight'
     pool:
       vmImage: 'windows-2022'
     environment: Auth0ToApplicationInsight
@@ -65,15 +61,15 @@ stages:
           - task: AzureResourceManagerTemplateDeployment@3
             inputs:
               deploymentScope: 'Resource Group'
-              azureResourceManagerConnection: 'AXPI SaaS(4d02c00f-2f0b-4eda-8a58-9a42594c8a1f)'
-              subscriptionId: 4d02c00f-2f0b-4eda-8a58-9a42594c8a1f
+              azureResourceManagerConnection: '$(subscription)'
+              subscriptionId: $(subscriptionId)
               action: 'Create Or Update Resource Group'
-              resourceGroupName: Auth0-Logs
-              location: northeurope
+              resourceGroupName: $(resourceGroup)
+              location: $(location)
               templateLocation: 'Linked artifact'
               csmFile: '$(Build.SourcesDirectory)/Infrastructure/ARM/Deploy.json'
               deploymentMode: 'Incremental'
-              deploymentName: '$(deploymentName)'
+              deploymentName: 'Auth0ToApplicationInsight'
               overrideParameters:  >-
                 -company $(company) -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) 
                 -functionName $(functionName)  -auth0LogConnectionString $(auth0LogConnectionString)
