@@ -40,10 +40,10 @@ stages:
           -functionName $(functionName)  -auth0LogConnectionString $(auth0LogConnectionString)
 
 #- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
-- stage: 'Stage' #Stage name cannot have spaces
+- stage: 'ProdEnv_Stage' #Stage name cannot have spaces
   dependsOn:
     - Build_Stage
-  displayName: 'Infrastructure' #Name displayed when viewing in Azure DevOps
+  displayName: 'InfrastructureDeploy' #Name displayed when viewing in Azure DevOps
   #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   variables:
   - group: Auth0ToApplicationInsight
@@ -51,8 +51,8 @@ stages:
   - deployment: 'Deploy' #Job name cannot have spaces
     displayName: 'Infrastructure' #Name displayed when viewing in Azure DevOps
     variables:
-      resourceGroup: '$(resourceGroup)' 
-      subscription: '$(subscription)'
+      resourceGroup: 'Auth0-Logs' 
+      subscription: 'AXPI SaaS(4d02c00f-2f0b-4eda-8a58-9a42594c8a1f)'
       deploymentName: 'Auth0ToApplicationInsight'
     pool:
       vmImage: 'windows-2022'
@@ -65,11 +65,11 @@ stages:
           - task: AzureResourceManagerTemplateDeployment@3
             inputs:
               deploymentScope: 'Resource Group'
-              azureResourceManagerConnection: '${{ variables.subscription }}'
-              subscriptionId: $(subscriptionId)
+              azureResourceManagerConnection: 'AXPI SaaS(4d02c00f-2f0b-4eda-8a58-9a42594c8a1f)'
+              subscriptionId: 4d02c00f-2f0b-4eda-8a58-9a42594c8a1f
               action: 'Create Or Update Resource Group'
-              resourceGroupName: $(resourceGroup)
-              location: $(location)
+              resourceGroupName: Auth0-Logs
+              location: northeurope
               templateLocation: 'Linked artifact'
               csmFile: '$(Build.SourcesDirectory)/Infrastructure/ARM/Deploy.json'
               deploymentMode: 'Incremental'
@@ -77,3 +77,43 @@ stages:
               overrideParameters:  >-
                 -company $(company) -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) 
                 -functionName $(functionName)  -auth0LogConnectionString $(auth0LogConnectionString)
+
+
+# #- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
+# - stage: 'ProdEnv_Stage' #Stage name cannot have spaces
+#   dependsOn:
+#     - Build_Stage
+#   displayName: 'InfrastructureDeploy' #Name displayed when viewing in Azure DevOps
+#   #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+#   variables:
+#   - group: Auth0ToApplicationInsight
+#   jobs:
+#   - deployment: 'Deploy' #Job name cannot have spaces
+#     displayName: 'Infrastructure' #Name displayed when viewing in Azure DevOps
+#     variables:
+#       resourceGroup: '$(resourceGroup)' 
+#       subscription: '$(subscription)'
+#       deploymentName: 'Auth0ToApplicationInsight'
+#     pool:
+#       vmImage: 'windows-2022'
+#     environment: Auth0ToApplicationInsight
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - checkout: self
+#           - task: AzureResourceManagerTemplateDeployment@3
+#             inputs:
+#               deploymentScope: 'Resource Group'
+#               azureResourceManagerConnection: '${{ variables.subscription }}'
+#               subscriptionId: $(subscriptionId)
+#               action: 'Create Or Update Resource Group'
+#               resourceGroupName: $(resourceGroup)
+#               location: $(location)
+#               templateLocation: 'Linked artifact'
+#               csmFile: '$(Build.SourcesDirectory)/Infrastructure/ARM/Deploy.json'
+#               deploymentMode: 'Incremental'
+#               deploymentName: '$(deploymentName)'
+#               overrideParameters:  >-
+#                 -company $(company) -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) 
+#                 -functionName $(functionName)  -auth0LogConnectionString $(auth0LogConnectionString)
