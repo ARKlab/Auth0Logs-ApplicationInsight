@@ -4,24 +4,20 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Azure.Messaging;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
-using Microsoft.ApplicationInsights;
 using Auth0LogEventGridFunction.Common;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using Microsoft.Extensions.Configuration;
-using Microsoft.ApplicationInsights.Extensibility;
+using Auth0toAI.Service;
 
 namespace Auth0EventGridFunction
 {
     public class EventTriggerFunction
     {
-        private TelemetryClient appInsights;
-        private IConfiguration _config;
+        private Auth0Service auth0Service;
 
-        public EventTriggerFunction(IConfiguration config) 
+        public EventTriggerFunction(Auth0Service _auth0Service) 
         {
-            _config = config;
-            appInsights = new TelemetryClient(new TelemetryConfiguration(_config["AUTH0_INSTRUMENTATION_KEY"]));
+            auth0Service = _auth0Service;
         }
 
         [FunctionName("EventTriggerFunction")]
@@ -92,13 +88,10 @@ namespace Auth0EventGridFunction
             if ((int)logLevelType.levelLog >= 3)
             {
                 var error = new Exception(dynamicRecord["type"].ToString());
-                appInsights.TrackException(error, properties);
+                auth0Service.TrackExceptionToApplicationInsight(error, properties);
             }
 
-            appInsights.TrackEvent(logLevelType.nameLog, properties: properties);
-            
-            // send data to azure
-            appInsights.Flush();
+            auth0Service.TrackEventToApplicationInsight(logLevelType.nameLog, properties: properties);
         }
     }
 }

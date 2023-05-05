@@ -30,8 +30,11 @@ stages:
         csmFile: '$(Build.SourcesDirectory)/Infrastructure/ARM/Deploy.json'
         deploymentMode: 'Validation'
         deploymentName: 'Auth0ToApplicationInsight'
-        overrideParameters: >-
-          -env ARM -notificationMailingList $(notificationMailingList) -nlog.smtp $(nlog.smtp)
+        auth0LogConnectionString: $auth0LogConnectionString
+        company: $(company)
+        eventGridTopicName: $(eventGridTopicName)
+        eventGridSubscriptionName: $(eventGridSubscriptionName)
+        eventGridSubscriptionName: $(eventGridSubscriptionName)
 
 - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
 #- ${{ if true }}:
@@ -68,14 +71,9 @@ stages:
                 csmFile: '$(Build.SourcesDirectory)/Infrastructure/ARM/Deploy.json'
                 deploymentMode: 'Incremental'
                 deploymentName: '$(deploymentName)'
-                overrideParameters:  >-
-                  -env Prod -notificationMailingList $(notificationMailingList) -nlog.smtp $(nlog.smtp)
-            - task: ARM Outputs@6
-              displayName: 'ARM Outputs'
-              inputs:
-                ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
-                ConnectedServiceNameARM: '${{ variables.subscription }}'
-                resourceGroupName: $(resourceGroup)
-                prefix: 'arm.'
-                whenLastDeploymentIsFailed: 'latestSuccesful'
-                deploymentNameFilter: '$(deploymentName)*'
+                auth0LogConnectionString: $auth0LogConnectionString
+                company: $(company)
+                eventGridTopicName: $(eventGridTopicName)
+                eventGridSubscriptionName: $(eventGridSubscriptionName)
+                eventGridSubscriptionName: $(eventGridSubscriptionName)
+
