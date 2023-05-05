@@ -1,0 +1,272 @@
+#trigger:
+#  batch: true
+#  branches:
+#    include:
+#    - develop
+#    - master
+#  paths:
+#    include:
+#    - Services/KTE.ForecastGasService
+#variables:
+#  workingDirectory: '$(Build.SourcesDirectory)/Services/KTE.ForecastGasService'
+#  vmImageName: 'windows-2022'
+#  ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+#    BuildConfiguration: 'release'
+#  ${{ if not(eq(variables['Build.SourceBranchName'], 'master')) }}:
+#    BuildConfiguration: 'debug'
+#  BuildPlatform: 'any cpu'
+#stages:
+#- stage: 'Build_Stage' #Stage name cannot have spaces
+#  displayName: 'Build' #Name displayed when viewing in Azure DevOps
+#  jobs:
+#  - job: 'Build_Job' #Job name cannot have spaces
+#    displayName: 'Build Service' #Name displayed when viewing in Azure DevOps
+#    pool:
+#      vmImage: $(vmImageName)
+#      demands:
+#      - msbuild
+#      - visualstudio
+#      - vstest
+#    variables:
+#      NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
+#    steps:
+#    - task: NuGetToolInstaller@1
+#      displayName: 'Use NuGet 6.x'
+#      inputs:
+#        versionSpec: 6.x      
+#    - task: UseDotNet@2
+#      displayName: 'Use .Net Core sdk'
+#      inputs:
+#        useGlobalJson: true
+#    - task: Cache@2
+#      displayName: Cache
+#      inputs:
+#        key: 'nuget | "$(Agent.OS)" | **/packages.lock.json,!**/bin/**,!**/obj/**'
+#        restoreKeys: |
+#          nuget | "$(Agent.OS)"
+#          nuget
+#        path: '$(NUGET_PACKAGES)'
+#        cacheHitVar: 'CACHE_RESTORED'
+#    - task: NuGetCommand@2
+#      displayName: 'NuGet restore'
+#      inputs:
+#        restoreSolution: '$(workingDirectory)/KTE.ForecastGasService.sln'
+#    - task: VSBuild@1
+#      displayName: 'Build solution'
+#      inputs:
+#        solution: '$(workingDirectory)/KTE.ForecastGasService.sln'
+#        vsVersion: "17.0"
+#        platform: '$(BuildPlatform)'
+#        configuration: '$(BuildConfiguration)'
+#        clean: true
+#        maximumCpuCount: true
+#    - task: VSBuild@1
+#      displayName: 'Build solution COPY for tests'
+#      inputs:
+#        solution: '$(workingDirectory)/KTE.ForecastGasService.sln'
+#        vsVersion: '17.0'
+#        platform: '$(BuildPlatform)'
+#        configuration: '$(BuildConfiguration)'
+#        maximumCpuCount: true
+
+#    - task: DotNetCoreCLI@2
+#      displayName: 'dotnet publish'
+#      inputs:
+#        command: publish
+#        publishWebProjects: false
+#        projects: '$(workingDirectory)/KTE.ForecastGas.FTPWatcher/KTE.ForecastGas.FTPWatcher.csproj'
+#        arguments: '-o "$(build.artifactstagingdirectory)/KTE.ForecastGas.FTPWatcher" --configuration $(BuildConfiguration) --no-build'
+#    - task: DotNetCoreCLI@2
+#      displayName: 'dotnet publish'
+#      inputs:
+#        command: publish
+#        publishWebProjects: false
+#        projects: '$(workingDirectory)/KTE.ForecastGas.Workflow/KTE.ForecastGas.Workflow.csproj'
+#        arguments: '-o "$(build.artifactstagingdirectory)/KTE.ForecastGas.Workflow" --configuration $(BuildConfiguration) --no-build'
+
+#    - task: DotNetCoreCLI@2
+#      displayName: 'dotnet publish'
+#      inputs:
+#        command: publish
+#        publishWebProjects: false
+#        projects: '$(workingDirectory)/KTE.ForecastGas.Scheduler/KTE.ForecastGas.Scheduler.csproj'
+#        arguments: '-o "$(build.artifactstagingdirectory)/KTE.ForecastGas.Scheduler" --configuration $(BuildConfiguration) --no-build'
+
+#    - task: CopyFiles@2
+#      displayName: 'Publish SQL project'
+#      inputs:
+#        SourceFolder: $(workingDirectory)/KTE.ForecastGas.Database
+#        Contents: |
+#          **\*.dacpac
+#          **\*.publish.xml
+#          **\_Migrations\*.sql
+#        TargetFolder: '$(build.artifactstagingdirectory)\sql'
+#        flattenFolders: true
+
+#    - task: Bash@3
+#      displayName: Install Azurite
+#      inputs:
+#        targetType: 'inline'
+#        script: |
+#          npm install -g azurite
+#          mkdir azurite
+#          azurite --silent --location azurite --debug azurite\debug.log &
+
+#    - task: VisualStudioTestPlatformInstaller@1
+#      inputs:
+#        packageFeedSelector: 'nugetOrg' # Options: nugetOrg, customFeed, netShare
+#        versionSelector: 'latestStable' # Required when packageFeedSelector == NugetOrg || PackageFeedSelector == CustomFeed# Options: latestPreRelease, latestStable, specificVersion
+#    - task: VSTest@2
+#      displayName: 'VsTest - testAssemblies'
+#      inputs:
+#        testAssemblyVer2: |
+#          **\*.Tests\**\$(BuildConfiguration)\**\*.Tests.dll
+#          !**\obj\**
+#          !**\ref\**
+#        vsTestVersion: 'toolsInstaller'
+#        searchFolder: '$(workingDirectory)'
+#        runSettingsFile: $(workingDirectory)/CodeCoverage.runsettings
+#        codeCoverageEnabled: true
+#        diagnosticsEnabled: true
+#        condition: and(succeeded(), not(contains(variables['Build.SourceVersionMessage'], '[SkipTests]')))
+        
+#    - task: PublishSymbols@2
+#      displayName: 'Publish symbols path'
+#      inputs:
+#        SymbolServerType: TeamServices
+#    - task: PublishBuildArtifacts@1
+#      displayName: 'Publish Artifact: drop'
+
+#- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/develop') }}:
+##- ${{ if true }}:
+#  - stage: DevEnv_Stage
+#    displayName: Dev Deploy Service
+#    dependsOn: Build_Stage
+#    jobs:
+#    - deployment: DevEnv_Deploy
+#      displayName: 'Dev Deploy Service'
+#      environment: 'Dev-ForecastGas'
+#      variables:
+#        resourceGroup: 'KtE-DEV-FORECASTGAS-RG' 
+#        subscription: 'DevOps_Subscription'
+#        deploymentName: 'Dev-ForecastGas'
+#      pool:
+#        vmImage: $(vmImageName)
+#      strategy:
+#        runOnce:
+#          deploy:
+#            steps:
+#            - task: ARM Outputs@6
+#              displayName: 'ARM Outputs'
+#              inputs:
+#                ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
+#                ConnectedServiceNameARM: '${{ variables.subscription }}'
+#                resourceGroupName: $(resourceGroup)
+#                prefix: 'arm.'
+#                whenLastDeploymentIsFailed: 'latestSuccesful'
+#                deploymentNameFilter: '$(deploymentName)*'
+#            - task: SqlAzureDacpacDeployment@1
+#              displayName: 'Pre Migrations'
+#              inputs:
+#                azureSubscription: '${{ variables.subscription }}'
+#                ServerName: '$(arm.serverFQDN)'
+#                DatabaseName: '$(arm.databaseName)'
+#                AuthenticationType: servicePrincipal
+#                deployType: SqlTask
+#                SqlFile: '$(Pipeline.Workspace)/drop/sql/RunMigration.PreDeployment.sql'
+#                SqlAdditionalArguments: '-Variable "MyPath = $(Pipeline.Workspace)\drop\sql\" -QueryTimeout 360'
+#            - task: SqlAzureDacpacDeployment@1
+#              displayName: DacPac
+#              inputs:
+#                azureSubscription: '${{ variables.subscription }}'
+#                ServerName: '$(arm.serverFQDN)'
+#                DatabaseName: '$(arm.databaseName)'
+#                AuthenticationType: servicePrincipal
+#                DacpacFile: '$(Pipeline.Workspace)/drop/sql/KTE.ForecastGas.Database.dacpac'
+#                PublishProfile: '$(Pipeline.Workspace)/drop/sql/KTE.ForecastGas.Database.publish.xml'
+#            - task: SqlAzureDacpacDeployment@1
+#              displayName: 'Pre Migrations (idempotency rerun)'
+#              inputs:
+#                azureSubscription: '${{ variables.subscription }}'
+#                ServerName: '$(arm.serverFQDN)'
+#                DatabaseName: '$(arm.databaseName)'
+#                AuthenticationType: servicePrincipal
+#                deployType: SqlTask
+#                SqlFile: '$(Pipeline.Workspace)/drop/sql/RunMigration.PreDeployment.sql'
+#                SqlAdditionalArguments: '-Variable "MyPath = $(Pipeline.Workspace)\drop\sql\" -QueryTimeout 360'
+#            - task: SqlAzureDacpacDeployment@1
+#              displayName: 'DacPac (idempotency rerun)'
+#              inputs:
+#                azureSubscription: '${{ variables.subscription }}'
+#                ServerName: '$(arm.serverFQDN)'
+#                DatabaseName: '$(arm.databaseName)'
+#                AuthenticationType: servicePrincipal
+#                DacpacFile: '$(Pipeline.Workspace)/drop/sql/KTE.ForecastGas.Database.dacpac'
+#                PublishProfile: '$(Pipeline.Workspace)/drop/sql/KTE.ForecastGas.Database.publish.xml'
+#            - task: AzureAppServiceManage@0
+#              displayName: 'Stop FTPWatcher'
+#              inputs:
+#                azureSubscription: '${{ variables.subscription }}'
+#                Action: 'Stop Azure App Service'
+#                WebAppName: '$(arm.workerFtpWatcherName)'
+#            - task: AzureAppServiceManage@0
+#              displayName: 'Stop Workflow Worker'
+#              inputs:
+#                azureSubscription: '${{ variables.subscription }}'
+#                Action: 'Stop Azure App Service'
+#                WebAppName: '$(arm.workerForecastGasWorkFlowName)'
+#            - task: AzureRmWebAppDeployment@4
+#              displayName: 'FTPWatcher Deploy: Service ZIP'
+#              inputs:
+#                azureSubscription: '${{ variables.subscription }}'
+#                appType: webAppLinux
+#                WebAppName: '$(arm.workerFtpWatcherName)'
+#                packageForLinux: '$(Pipeline.Workspace)/drop/KTE.ForecastGas.FTPWatcher/KTE.ForecastGas.FTPWatcher.zip'
+#                enableCustomDeployment: true
+#                DeploymentType: zipDeploy
+#                TakeAppOfflineFlag: false
+#            - task: AzureRmWebAppDeployment@4
+#              displayName: 'Workflow Worker Deploy: Service ZIP'
+#              inputs:
+#                azureSubscription: '${{ variables.subscription }}'
+#                appType: webAppLinux
+#                WebAppName: '$(arm.workerForecastGasWorkFlowName)'
+#                packageForLinux: '$(Pipeline.Workspace)/drop/KTE.ForecastGas.Workflow/KTE.ForecastGas.Workflow.zip'
+#                enableCustomDeployment: true
+#                DeploymentType: zipDeploy
+#                TakeAppOfflineFlag: false
+#            - task: AzureFunctionApp@1
+#              displayName: 'Azure functions Scheduler Deploy'
+#              inputs:
+#                azureSubscription: '${{ variables.subscription }}'
+#                appType: functionApp
+#                appName: $(arm.forecastGasSchedulerFunctionName)
+#                package: '$(Pipeline.Workspace)/drop/KTE.ForecastGas.Scheduler/KTE.ForecastGas.Scheduler.zip'
+#            - task: SqlAzureDacpacDeployment@1
+#              displayName: 'Ensure roleForecastGasUser AADGroup is associated to AppRole'
+#              inputs:
+#                azureSubscription: '${{ variables.subscription }}'
+#                ServerName: '$(arm.serverFQDN)'
+#                DatabaseName: '$(arm.databaseName)'
+#                AuthenticationType: servicePrincipal
+#                deployType: InlineSqlTask
+#                SqlInline: |
+#                  -- create user would fail if exists
+#                  IF NOT EXISTS(SELECT principal_id FROM sys.database_principals WHERE name = 'roleForecastGasUser') BEGIN
+#                      CREATE USER [roleForecastGasUser] FROM EXTERNAL PROVIDER
+#                  END
+
+#                  EXEC('ALTER ROLE [ForecastGasUser] ADD MEMBER [roleForecastGasUser]')
+#            - task: AzureAppServiceManage@0
+#              displayName: 'Start FTPWatcher'
+#              inputs:
+#                azureSubscription: '${{ variables.subscription }}'
+#                Action: 'Start Azure App Service'
+#                WebAppName: '$(arm.workerFtpWatcherName)'
+           
+#            - task: AzureAppServiceManage@0
+#              displayName: 'Start Workflow Worker'
+#              inputs:
+#                azureSubscription: '${{ variables.subscription }}'
+#                Action: 'Start Azure App Service'
+#                WebAppName: '$(arm.workerForecastGasWorkFlowName)'
