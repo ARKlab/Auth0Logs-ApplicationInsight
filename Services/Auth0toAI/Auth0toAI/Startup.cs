@@ -10,10 +10,6 @@ namespace Auth0toAI
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            var config = new ConfigurationBuilder()
-               .AddEnvironmentVariables()
-               .Build();
-
             builder.Services.AddSingleton<Auth0Service>();
         }
     }
