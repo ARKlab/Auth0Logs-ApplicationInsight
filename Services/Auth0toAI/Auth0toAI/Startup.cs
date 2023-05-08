@@ -1,13 +1,10 @@
-﻿using Microsoft.ApplicationInsights;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.AspNetCore.Builder;
 using Auth0toAI.Service;
 
-[assembly: FunctionsStartup(typeof(Auth0EventGridFunction.Startup))]
-namespace Auth0EventGridFunction
+[assembly: FunctionsStartup(typeof(Auth0toAI.Startup))]
+namespace Auth0toAI
 {
     public class Startup : FunctionsStartup
     {

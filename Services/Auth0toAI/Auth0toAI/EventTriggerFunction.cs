@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Auth0toAI.Service;
 
-namespace Auth0EventGridFunction
+namespace Auth0toAI
 {
     public class EventTriggerFunction
     {
