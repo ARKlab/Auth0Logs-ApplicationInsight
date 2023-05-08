@@ -213,7 +213,7 @@
                 "userAssignedIdentities": { "[variables('identityId')]": {} }
             },
           "dependsOn": [
-            "[concat('Microsoft.KeyVault/vaults', variables('shortName'), '-kv', '/secrets/ConnectionStrings--Auth0ToAI-Storage')]",
+            "[concat('Microsoft.KeyVault/vaults/', variables('shortName'), '-kv', '/secrets/ConnectionStrings--Auth0ToAI-Storage')]",
             "[resourceId('Microsoft.Web/serverfarms', concat(parameters('uniquePrefixName'), '-', variables('projectName'), '-', 'ASP'))]",
             "[variables('identityId')]"
           ],
