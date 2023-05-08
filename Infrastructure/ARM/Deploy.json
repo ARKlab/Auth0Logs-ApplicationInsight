@@ -5,15 +5,6 @@
         "company": {
             "type": "string"
         },
-        "eventGridTopicName": {
-            "type": "string"
-        },
-        "eventGridSubscriptionName": {
-            "type": "string"
-        },
-        "functionName": {
-            "type": "string"
-        },
         "auth0LogConnectionString": {
             "type": "string"
         }
@@ -137,23 +128,6 @@
              "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
             ]
-            // "properties": {
-            //     "accessTier": "TransactionOptimized",
-            //     "enabledProtocols": "string",
-            //     "metadata": {},
-            //     "rootSquash": "string",
-            //     "shareQuota": "int",
-            //     "signedIdentifiers": [
-            //     {
-            //         "accessPolicy": {
-            //         "expiryTime": "string",
-            //         "permission": "string",
-            //         "startTime": "string"
-            //         },
-            //         "id": "string"
-            //     }
-            //     ]
-            // }
             },
         {
             "type": "Microsoft.Insights/components",
@@ -162,8 +136,7 @@
             "location": "[variables('location')]",
             "kind": "web",
             "properties": {
-                "Application_Type": "web"//,
-                //"WorkspaceResourceId": "[variables('sharedLawId')]"
+                "Application_Type": "web"
             }
         },
         {
@@ -214,9 +187,7 @@
             "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', concat(parameters('company'), '-', variables('projectName'), '-', 'ASP'))]",
             "siteConfig": {
               "numberOfWorkers": 1,
-              //"httpLoggingEnabled": true,
               "http20Enabled": false,
-              //"linuxFxVersion":  "DOTNET|6.0",
               "alwaysOn": false
             },
             "httpsOnly": true,
@@ -239,7 +210,7 @@
                     "FUNCTIONS_EXTENSION_VERSION": "~4",
                     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
                     "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
-                    "WEBSITE_CONTENTSHARE": "[concat(variables('shortName'), 'sha')]", // "auth0logeventgrida63a",
+                    "WEBSITE_CONTENTSHARE": "[concat(variables('shortName'), 'sha')]",
                     "WEBSITE_RUN_FROM_PACKAGE": "1"
                   }
                 },                
@@ -271,33 +242,7 @@
                     ]
                 }
             ]
-        }//,
-        // {
-        //     "type": "Microsoft.EventGrid/eventSubscriptions",
-        //     "apiVersion": "2020-06-01",
-        //     "name": "[parameters('eventGridSubscriptionName')]",
-        //     "properties": {
-        //         "topic": "[concat('/subscriptions/', subscription().tenantId,'/resourceGroups/', resourceGroup().name,'/providers/Microsoft.EventGrid/partnerTopics/', parameters('eventGridTopicName'))]",
-		//         "destination": {
-        //             "endpointType": "AzureFunction",
-        //             "properties": {
- 		// 		        "resourceId": "[resourceId('Microsoft.Web/sites/', variables('auth0ToApplicationInsightFunctionName'),'functions/', parameters('functionName'))]",
-        //                 "maxEventsPerBatch": 1,
-		// 		        "preferredBatchSizeInKilobytes": 64
-        //             }
-        //         },
-        //     "filter": {
-        //         "advancedFilters": [],
-        //         "enableAdvancedFilteringOnArrays": true
-        //     },
-        //     "labels": [],
-        //     "eventDeliverySchema": "CloudEventSchemaV1_0"
-        //     }
-        //     //,
-        //     // "dependsOn": [
-        //     //     "[resourceId('Microsoft.EventGrid/partnerTopics', parameters('eventGridTopicName'))]"
-        //     // ]
-        // }
+        }
     ],
   "outputs": {
     "identityName": {
