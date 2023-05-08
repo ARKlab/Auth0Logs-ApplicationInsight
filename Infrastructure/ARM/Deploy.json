@@ -101,6 +101,7 @@
                     },
                     "roles": {
                         "value": [
+                            "Key Vault Secrets User",
                             "Storage Account Queue Contributor",
                             "Storage Account Blob Data Owner",
                             "Storage Account Contributor",
@@ -118,9 +119,7 @@
             "sku": { "name": "Standard_LRS" },
             "kind": "StorageV2",
             "properties": {
-                "isHnsEnabled": true//,
-                // "isLocalUserEnabled": true,
-                // "isSftpEnabled": false
+                "isHnsEnabled": true
             }
         },
         {
@@ -245,13 +244,11 @@
                     "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components', variables('applicationInsightsName')), '2020-02-02-preview').InstrumentationKey]",
                     "APPLICATIONINSIGHTS_CONNECTION_STRING": "[reference(resourceId('microsoft.insights/components', variables('applicationInsightsName')), '2020-02-02-preview').ConnectionString]",
                     "Auth0LogConnectionString": "[parameters('auth0LogConnectionString')]",
-                    //"AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
                     "AzureWebJobsStorage__clientId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName'))).clientId]",
                     "AzureWebJobsStorage__accountName": "[variables('storageAccountName')]",
                     "AzureWebJobsStorage__credential":"managedidentity",
                     "FUNCTIONS_EXTENSION_VERSION": "~4",
                     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-                  //"WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
                     "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', concat(variables('shortName'), '-kv'), 'ConnectionStrings--Auth0ToAI-Storage')).secretUri, ')')]",
                     "WEBSITE_CONTENTSHARE": "[concat(variables('shortName'), 'sha')]",
                     "WEBSITE_RUN_FROM_PACKAGE": "1"
