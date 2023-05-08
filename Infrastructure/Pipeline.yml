@@ -36,8 +36,7 @@ stages:
         # eventGridTopicName: $(eventGridTopicName)
         # eventGridSubscriptionName: $(eventGridSubscriptionName)
         overrideParameters: >-
-          -company $(company) -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) 
-          -functionName $(functionName)  -auth0LogConnectionString $(auth0LogConnectionString)
+          -company $(company) -auth0LogConnectionString $(auth0LogConnectionString)
 
 #- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
 - stage: 'ProdEnv_Stage' #Stage name cannot have spaces
@@ -71,8 +70,7 @@ stages:
               deploymentMode: 'Incremental'
               deploymentName: 'Auth0ToApplicationInsight'
               overrideParameters:  >-
-                -company $(company) -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) 
-                -functionName $(functionName)  -auth0LogConnectionString $(auth0LogConnectionString)
+                -company $(company) -auth0LogConnectionString $(auth0LogConnectionString)
 
 
 # #- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
