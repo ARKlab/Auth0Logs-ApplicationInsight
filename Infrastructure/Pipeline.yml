@@ -31,7 +31,7 @@ stages:
         deploymentMode: 'Validation'
         deploymentName: 'Auth0ToApplicationInsight'
         overrideParameters: >-
-          -company $(company) -auth0LogConnectionString $(auth0LogConnectionString)
+          -uniquePrefixName $(uniquePrefixName) -auth0LogConnectionString $(auth0LogConnectionString) -sharedLawId $(sharedLawId)
 
 #- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
 - stage: 'ProdEnv_Stage' #Stage name cannot have spaces
@@ -65,4 +65,4 @@ stages:
               deploymentMode: 'Incremental'
               deploymentName: 'Auth0ToApplicationInsight'
               overrideParameters:  >-
-                -company $(company) -auth0LogConnectionString $(auth0LogConnectionString)
+                -uniquePrefixName $(uniquePrefixName) -auth0LogConnectionString $(auth0LogConnectionString) -sharedLawId $(sharedLawId)

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Azure.Messaging;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
-using Auth0LogEventGridFunction.Common;
+using Auth0toAI.Common;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Auth0toAI.Service;

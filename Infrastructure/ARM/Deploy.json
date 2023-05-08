@@ -2,10 +2,13 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "company": {
+        "uniquePrefixName": {
             "type": "string"
         },
         "auth0LogConnectionString": {
+            "type": "string"
+        },
+        "sharedLawId": {
             "type": "string"
         }
     },
@@ -98,7 +101,6 @@
                     },
                     "roles": {
                         "value": [
-                            "Key Vault Secrets User",
                             "Storage Account Queue Contributor",
                             "Storage Account Blob Data Owner",
                             "Storage Account Contributor",
@@ -116,9 +118,9 @@
             "sku": { "name": "Standard_LRS" },
             "kind": "StorageV2",
             "properties": {
-                "isHnsEnabled": true,
-                "isLocalUserEnabled": true,
-                "isSftpEnabled": true
+                "isHnsEnabled": true//,
+                // "isLocalUserEnabled": true,
+                // "isSftpEnabled": false
             }
         },
         {
@@ -136,7 +138,8 @@
             "location": "[variables('location')]",
             "kind": "web",
             "properties": {
-                "Application_Type": "web"
+                "Application_Type": "web",
+                "WorkspaceResourceId": "[parameters('sharedLawId')]"
             }
         },
         {
@@ -154,7 +157,7 @@
             }
         },
       {
-        "name": "[concat(parameters('company'), '-', variables('projectName'), '-', 'ASP')]",
+        "name": "[concat(parameters('uniquePrefixName'), '-', variables('projectName'), '-', 'ASP')]",
         "type": "Microsoft.Web/serverfarms",
         "apiVersion": "2022-03-01",
         "kind": "functionapp",
@@ -178,13 +181,13 @@
                 "userAssignedIdentities": { "[variables('identityId')]": {} }
             },
           "dependsOn": [
-            "[resourceId('Microsoft.Web/serverfarms', concat(parameters('company'), '-', variables('projectName'), '-', 'ASP'))]",
+            "[resourceId('Microsoft.Web/serverfarms', concat(parameters('uniquePrefixName'), '-', variables('projectName'), '-', 'ASP'))]",
             "[variables('identityId')]"
           ],
           "properties": {
             "reserved": false,
             "name": "[variables('auth0ToApplicationInsightFunctionName')]",
-            "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', concat(parameters('company'), '-', variables('projectName'), '-', 'ASP'))]",
+            "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', concat(parameters('uniquePrefixName'), '-', variables('projectName'), '-', 'ASP'))]",
             "siteConfig": {
               "numberOfWorkers": 1,
               "http20Enabled": false,
@@ -206,7 +209,10 @@
                     "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components', variables('applicationInsightsName')), '2020-02-02-preview').InstrumentationKey]",
                     "APPLICATIONINSIGHTS_CONNECTION_STRING": "[reference(resourceId('microsoft.insights/components', variables('applicationInsightsName')), '2020-02-02-preview').ConnectionString]",
                     "Auth0LogConnectionString": "[parameters('auth0LogConnectionString')]",
-                    "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
+                    //"AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
+                    "AzureWebJobsStorage__clientId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName'))).clientId]",
+                    "AzureWebJobsStorage__accountName": "[variables('storageAccountName')]",
+                    "AzureWebJobsStorage__credential":"managedidentity",
                     "FUNCTIONS_EXTENSION_VERSION": "~4",
                     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
                     "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",

@@ -1,7 +1,7 @@
 ﻿using System;
-using static Auth0LogEventGridFunction.Common.MessageTypeHelper;
+using static Auth0toAI.Common.MessageTypeHelper;
 
-namespace Auth0LogEventGridFunction.Common
+namespace Auth0toAI.Common
 {
     public static class MessageTypeHelper
     {
