@@ -20,8 +20,7 @@
     "applicationInsightsName": "[concat(variables('shortName'), '-', 'ai')]",
     "identityName": "[concat(variables('shortName'),'-', 'id')]",
     "identityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName'))]",
-    "auth0ToApplicationInsightFunctionName": "[concat('Fx', '-Connector-', variables('shortName'))]",
-    "sharedLawId": "[resourceId(resourceGroup().name,'Microsoft.OperationalInsights/workspaces',parameters('sharedLawId'))]"
+    "auth0ToApplicationInsightFunctionName": "[concat('Fx', '-Connector-', variables('shortName'))]"
   },
     "resources": [
         {
@@ -140,7 +139,7 @@
             "kind": "web",
             "properties": {
                 "Application_Type": "web",
-                "WorkspaceResourceId": "[variables('sharedLawId')]"
+                "WorkspaceResourceId": "[parameters('sharedLawId')]"
             }
         },
         {
