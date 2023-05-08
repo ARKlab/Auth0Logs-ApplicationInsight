@@ -183,9 +183,12 @@
                         "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value,';EndpointSuffix=','core.windows.net')]"
                     },
                     "dependsOn": [
-                        "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
+                        "[resourceId('Microsoft.KeyVault/vaults', concat(variables('shortName'), '-kv'))]"
                     ]
                 }
+            ],
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
             ]
         },
         {
