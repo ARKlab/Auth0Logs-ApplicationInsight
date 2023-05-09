@@ -1,22 +1,22 @@
 ﻿using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
 
 namespace Auth0toAI.Service
 {
-    public class Auth0Service : IDisposable
+    public sealed class Auth0Service : IDisposable
     {
         private IConfiguration _config;
         private TelemetryClient _telemetryClient;
+        private TelemetryConfiguration _telemetryConfiguration;
+
         public Auth0Service(IConfiguration config)
         {
             _config = config;
 
-            var telemetryConfiguration = new TelemetryConfiguration();
-            telemetryConfiguration.ConnectionString = _config["Auth0LogConnectionString"];
-            _telemetryClient = new TelemetryClient(telemetryConfiguration);
+            _telemetryConfiguration = new TelemetryConfiguration();
+            _telemetryConfiguration.ConnectionString = _config["Auth0LogConnectionString"];
+            _telemetryClient = new TelemetryClient(_telemetryConfiguration);
         }
 
         public void TrackEventToApplicationInsight(string name, Dictionary<string, string> properties)
@@ -32,6 +32,7 @@ namespace Auth0toAI.Service
         public void Dispose()
         {
             _telemetryClient.Flush();
+            _telemetryConfiguration.Dispose();
         }
     }
 }
