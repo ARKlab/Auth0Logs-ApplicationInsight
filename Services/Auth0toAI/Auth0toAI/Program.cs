@@ -9,9 +9,6 @@ var host = new HostBuilder()
         config.AddEnvironmentVariables();
     })
     .ConfigureServices((c, s) => {
-
-        var cfg = c.Configuration;
-        
         s.AddSingleton<Auth0Service>();
     })
     .Build();
