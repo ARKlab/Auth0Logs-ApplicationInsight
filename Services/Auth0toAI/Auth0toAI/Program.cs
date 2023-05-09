@@ -11,6 +11,6 @@ var host = new HostBuilder()
     .ConfigureServices((c, s) => {
         s.AddSingleton<Auth0Service>();
     })
-    .Build();
+    .Build(); 
 
 host.Run();
