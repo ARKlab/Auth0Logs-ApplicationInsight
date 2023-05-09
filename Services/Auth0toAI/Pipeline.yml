@@ -10,7 +10,7 @@ variables:
  workingDirectory: '$(Build.SourcesDirectory)/Services/Auth0toAI'
  vmImageName: 'windows-2022'
 #  ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
-   BuildConfiguration: 'release'
+ BuildConfiguration: 'release'
  BuildPlatform: 'any cpu'
 stages:
 - stage: 'Build_Stage' #Stage name cannot have spaces
