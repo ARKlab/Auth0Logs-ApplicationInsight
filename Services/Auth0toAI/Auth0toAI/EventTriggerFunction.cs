@@ -21,9 +21,9 @@ namespace Auth0toAI
         [Function("EventTriggerFunction")]
         public void Run([EventGridTrigger] CloudEvent cloudEvent)
         {
-            _logger.LogInformation("Event received {type} {subject}", cloudEvent.Type, cloudEvent.Subject);
+            _logger.LogDebug("Event received {type} {subject}", cloudEvent.Type, cloudEvent.Subject);
 
-            _logger.LogInformation("Event Data : {data}", cloudEvent.Data.ToString());
+            _logger.LogDebug("Event Data : {data}", cloudEvent.Data.ToString());
 
             var dynamicRecord = JsonConvert.DeserializeObject<JObject>(cloudEvent.Data.ToString())!;
 

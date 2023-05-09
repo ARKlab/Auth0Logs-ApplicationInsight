@@ -9,29 +9,29 @@ namespace Auth0toAI.Service
     public class Auth0Service : IDisposable
     {
         private IConfiguration _config;
-        private TelemetryClient telemetryClient;
+        private TelemetryClient _telemetryClient;
         public Auth0Service(IConfiguration config)
         {
             _config = config;
 
             var telemetryConfiguration = new TelemetryConfiguration();
             telemetryConfiguration.ConnectionString = _config["Auth0LogConnectionString"];
-            telemetryClient = new TelemetryClient(telemetryConfiguration);
+            _telemetryClient = new TelemetryClient(telemetryConfiguration);
         }
 
         public void TrackEventToApplicationInsight(string name, Dictionary<string, string> properties)
         {
-            telemetryClient.TrackEvent(name, properties);
+            _telemetryClient.TrackEvent(name, properties);
         }
 
         public void TrackExceptionToApplicationInsight(Exception exception, Dictionary<string, string> properties)
         {
-            telemetryClient.TrackException(exception, properties);
+            _telemetryClient.TrackException(exception, properties);
         }
 
         public void Dispose()
         {
-            telemetryClient.Flush();
+            _telemetryClient.Flush();
         }
     }
 }
