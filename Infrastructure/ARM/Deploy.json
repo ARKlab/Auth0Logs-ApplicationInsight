@@ -248,7 +248,7 @@
                     "AzureWebJobsStorage__accountName": "[variables('storageAccountName')]",
                     "AzureWebJobsStorage__credential":"managedidentity",
                     "FUNCTIONS_EXTENSION_VERSION": "~4",
-                    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+                    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
                     "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', concat(variables('shortName'), '-kv'), 'ConnectionStrings--Auth0ToAI-Storage')).secretUri, ')')]",
                     "WEBSITE_CONTENTSHARE": "[concat(variables('shortName'), 'sha')]",
                     "WEBSITE_RUN_FROM_PACKAGE": "1"

@@ -1,33 +1,29 @@
-using System;
-using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Azure.Messaging;
-using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Auth0toAI.Common;
-using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Auth0toAI.Service;
+using Microsoft.Azure.Functions.Worker;
 
 namespace Auth0toAI
 {
     public class EventTriggerFunction
     {
-        private Auth0Service auth0Service;
-
-        public EventTriggerFunction(Auth0Service _auth0Service) 
+        private Auth0Service _auth0Service;
+        private readonly ILogger _logger;
+        public EventTriggerFunction(Auth0Service auth0Service, ILoggerFactory loggerFactory) 
         {
-            auth0Service = _auth0Service;
+            _auth0Service = auth0Service;
+            _logger = loggerFactory.CreateLogger<EventTriggerFunction>();
         }
 
-        [FunctionName("EventTriggerFunction")]
-        public void Run(
-            Microsoft.Extensions.Logging.ILogger logger,
-            [EventGridTrigger] CloudEvent cloudEvent)
+        [Function("EventTriggerFunction")]
+        public void Run([EventGridTrigger] CloudEvent cloudEvent)
         {
-            logger.LogInformation("Event received {type} {subject}", cloudEvent.Type, cloudEvent.Subject);
+            _logger.LogInformation("Event received {type} {subject}", cloudEvent.Type, cloudEvent.Subject);
 
-            logger.LogInformation("Event Data : {data}", cloudEvent.Data.ToString());
+            _logger.LogInformation("Event Data : {data}", cloudEvent.Data.ToString());
 
             var dynamicRecord = JsonConvert.DeserializeObject<JObject>(cloudEvent.Data.ToString())!;
 
@@ -88,10 +84,10 @@ namespace Auth0toAI
             if ((int)logLevelType.levelLog >= 3)
             {
                 var error = new Exception(dynamicRecord["type"].ToString());
-                auth0Service.TrackExceptionToApplicationInsight(error, properties);
+                _auth0Service.TrackExceptionToApplicationInsight(error, properties);
             }
 
-            auth0Service.TrackEventToApplicationInsight(logLevelType.nameLog, properties: properties);
+            _auth0Service.TrackEventToApplicationInsight(logLevelType.nameLog, properties: properties);
         }
     }
 }

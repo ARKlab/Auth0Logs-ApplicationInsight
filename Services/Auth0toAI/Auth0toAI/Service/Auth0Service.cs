@@ -9,7 +9,7 @@ namespace Auth0toAI.Service
     public class Auth0Service : IDisposable
     {
         private IConfiguration _config;
-        public TelemetryClient telemetryClient;
+        private TelemetryClient telemetryClient;
         public Auth0Service(IConfiguration config)
         {
             _config = config;
