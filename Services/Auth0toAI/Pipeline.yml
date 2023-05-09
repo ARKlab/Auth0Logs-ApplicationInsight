@@ -129,7 +129,7 @@ stages:
               displayName: 'ARM Outputs'
               inputs:
                 ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
-                ConnectedServiceNameARM: '$(subscription)'
+                ConnectedServiceNameARM: '$(azureResurceManagerConnection)'
                 resourceGroupName: $(resourceGroup)
                 prefix: 'arm.'
                 whenLastDeploymentIsFailed: 'latestSuccesful'
@@ -137,13 +137,13 @@ stages:
             # - task: AzureAppServiceManage@0
             #   displayName: 'Stop Workflow Worker'
             #   inputs:
-            #     azureSubscription: '$(subscription)'
+            #     azureSubscription: '$(azureResurceManagerConnection)'
             #     Action: 'Stop Azure App Service'
             #     WebAppName: '$(arm.workerForecastGasWorkFlowName)'
             - task: AzureFunctionApp@1
               displayName: 'Azure functions Scheduler Deploy'
               inputs:
-                azureSubscription: '$(subscription)'
+                azureSubscription: '$(azureResurceManagerConnection)'
                 appType: functionApp
                 appName: $(arm.auth0ToApplicationInsightFunctionName)
                 package: '$(Pipeline.Workspace)/drop/Auth0toAI/Auth0toAI.zip'
