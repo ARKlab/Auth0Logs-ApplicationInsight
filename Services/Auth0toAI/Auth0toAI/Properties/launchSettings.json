@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Auth0EventGridHttpFunction": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7151",
+      "launchBrowser": false
+    }
+  }
+}
