@@ -106,7 +106,7 @@ stages:
        resourceGroupName: $(resourceGroup)
        location: '$(location)'
        templateLocation: 'Linked artifact'
-       csmFile: '$(Build.SourcesDirectory)/Services/ARM/Deploy.json'
+       csmFile: '$(workingDirectory)/ARM/Deploy.json'
        deploymentMode: 'Validation'
        deploymentName: 'Auth0ToApplicationInsight'
        overrideParameters: >-
