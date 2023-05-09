@@ -106,7 +106,7 @@ stages:
        resourceGroupName: $(resourceGroup)
        location: '$(location)'
        templateLocation: 'Linked artifact'
-       csmFile: '$(workingDirectory)/Auth0toAI/ARM/Deploy.json'
+       csmFile: '$(workingDirectory)/ARM/Deploy.json'
        deploymentMode: 'Validation'
        deploymentName: 'Auth0ToApplicationInsightFunction'
        overrideParameters: >-
@@ -181,9 +181,9 @@ stages:
                 resourceGroupName: $(resourceGroup)
                 location: '$(location)'
                 templateLocation: 'Linked artifact'
-                csmFile: '$(workingDirectory)/Auth0toAI/ARM/Deploy.json'
+                csmFile: '$(workingDirectory)/ARM/Deploy.json'
                 deploymentMode: 'Validation'
-                deploymentName: 'Auth0ToApplicationInsightFunctionDeploy'
+                deploymentName: 'Auth0ToApplicationInsightFunction'
                 overrideParameters: >-
                   -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) -functionName $(functionName)
 
