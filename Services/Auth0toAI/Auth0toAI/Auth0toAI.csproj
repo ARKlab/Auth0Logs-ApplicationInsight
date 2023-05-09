@@ -29,4 +29,10 @@
 	<ItemGroup>
 		<Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext" />
 	</ItemGroup>
+	<ItemGroup>
+	  <EditorConfigFiles Remove="C:\work\repos\ARKlab\Auth0Logs-ApplicationInsight\Services\Auth0toAI\Auth0toAI\.editorconfig" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="C:\work\repos\ARKlab\Auth0Logs-ApplicationInsight\Services\Auth0toAI\Auth0toAI\.editorconfig" />
+	</ItemGroup>
 </Project>
