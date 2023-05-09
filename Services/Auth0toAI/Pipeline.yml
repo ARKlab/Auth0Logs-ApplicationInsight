@@ -7,11 +7,16 @@ trigger:
    include:
    - Services/Auth0toAI
 variables:
- workingDirectory: '$(Build.SourcesDirectory)/Services/Auth0toAI'
- vmImageName: 'windows-2022'
+ - group: Auth0ToApplicationInsight
+ - name: workingDirectory
+   value: '$(Build.SourcesDirectory)/Services/Auth0toAI'
+ - name: vmImageName
+   value: 'windows-2022'
 #  ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
- BuildConfiguration: 'release'
- BuildPlatform: 'any cpu'
+ - name: BuildConfiguration
+   value: 'release'
+ - name: BuildPlatform
+   value: 'any cpu'
 stages:
 - stage: 'Build_Stage' #Stage name cannot have spaces
   displayName: 'Build' #Name displayed when viewing in Azure DevOps
@@ -25,7 +30,9 @@ stages:
       - visualstudio
       - vstest
     variables:
-      NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
+      - group: Auth0ToApplicationInsight
+      - name: NUGET_PACKAGES
+        value: $(Pipeline.Workspace)/.nuget/packages
     steps:
     - task: NuGetToolInstaller@1
       displayName: 'Use NuGet 6.x'
