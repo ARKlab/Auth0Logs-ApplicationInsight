@@ -108,7 +108,7 @@ stages:
        templateLocation: 'Linked artifact'
        csmFile: '$(workingDirectory)/ARM/Deploy.json'
        deploymentMode: 'Validation'
-       deploymentName: 'Auth0ToApplicationInsight'
+       deploymentName: 'Auth0ToApplicationInsightFunction'
        overrideParameters: >-
         -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) -functionName $(functionName)
 
