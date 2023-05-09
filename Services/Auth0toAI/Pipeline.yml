@@ -126,7 +126,8 @@ stages:
       - group: Auth0ToApplicationInsight
       # resourceGroup: 'KtE-PROD-FORECASTGAS-RG'
       # subscription: 'DevOps_Subscription'
-      #deploymentName: 'Auth0ToApplicationInsight'
+      - name: deploymentName
+        value: 'Auth0ToApplicationInsight'
       pool:
         vmImage: $(vmImageName)
       strategy:
