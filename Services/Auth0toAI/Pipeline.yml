@@ -12,7 +12,6 @@ variables:
    value: '$(Build.SourcesDirectory)/Services/Auth0toAI'
  - name: vmImageName
    value: 'windows-2022'
-#  ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
  - name: BuildConfiguration
    value: 'release'
  - name: BuildPlatform
@@ -43,15 +42,6 @@ stages:
       inputs:
         packageType: 'sdk'
         version: '6.0.x'
-    # - task: Cache@2
-    #   displayName: Cache
-    #   inputs:
-    #    key: 'nuget | "$(Agent.OS)" | **/packages.lock.json,!**/bin/**,!**/obj/**'
-    #    restoreKeys: |
-    #      nuget | "$(Agent.OS)"
-    #      nuget
-    #    path: '$(NUGET_PACKAGES)'
-    #    cacheHitVar: 'CACHE_RESTORED'
     - task: NuGetCommand@2
       displayName: 'NuGet restore'
       inputs:
@@ -65,15 +55,6 @@ stages:
        configuration: '$(BuildConfiguration)'
        clean: true
        maximumCpuCount: true
-    # - task: VSBuild@1
-    #   displayName: 'Build solution COPY for tests'
-    #   inputs:
-    #    solution: '$(workingDirectory)/Auth0toAI.sln'
-    #    vsVersion: '17.0'
-    #    platform: '$(BuildPlatform)'
-    #    configuration: '$(BuildConfiguration)'
-    #    maximumCpuCount: true
-
     - task: DotNetCoreCLI@2
       displayName: 'dotnet publish'
       inputs:
@@ -124,8 +105,6 @@ stages:
       environment: Auth0ToApplicationInsight
       variables:
       - group: Auth0ToApplicationInsight
-      # resourceGroup: 'KtE-PROD-FORECASTGAS-RG'
-      # subscription: 'DevOps_Subscription'
       - name: deploymentName
         value: 'Auth0ToApplicationInsight'
       pool:
@@ -143,12 +122,6 @@ stages:
                 prefix: 'arm.'
                 whenLastDeploymentIsFailed: 'latestSuccesful'
                 deploymentNameFilter: '$(deploymentName)*'
-            # - task: AzureAppServiceManage@0
-            #   displayName: 'Stop Workflow Worker'
-            #   inputs:
-            #     azureSubscription: '$(azureResurceManagerConnection)'
-            #     Action: 'Stop Azure App Service'
-            #     WebAppName: '$(arm.workerForecastGasWorkFlowName)'
             - task: AzureFunctionApp@1
               displayName: 'Azure functions Scheduler Deploy'
               inputs:
@@ -156,22 +129,6 @@ stages:
                 appType: functionApp
                 appName: $(arm.auth0ToApplicationInsightFunctionName)
                 package: '$(Pipeline.Workspace)/drop/Auth0toAI/Auth0toAI.zip'
-            # - task: SqlAzureDacpacDeployment@1
-            #   displayName: 'Ensure roleForecastGasUser AADGroup is associated to AppRole'
-            #   inputs:
-            #     azureSubscription: '${{ variables.subscription }}'
-            #     ServerName: '$(arm.serverFQDN)'
-            #     DatabaseName: '$(arm.databaseName)'
-            #     AuthenticationType: servicePrincipal
-            #     deployType: InlineSqlTask
-            #     SqlInline: |
-            #       -- create user would fail if exists
-            #       IF NOT EXISTS(SELECT principal_id FROM sys.database_principals WHERE name = 'roleForecastGasUser') BEGIN
-            #           CREATE USER [roleForecastGasUser] FROM EXTERNAL PROVIDER
-            #       END
-
-            #       EXEC('ALTER ROLE [ForecastGasUser] ADD MEMBER [roleForecastGasUser]')
-            # deploy.json create azure function subscription
             - task: AzureResourceManagerTemplateDeployment@3
               inputs:
                 deploymentScope: 'Resource Group'
@@ -186,18 +143,3 @@ stages:
                 deploymentName: 'Auth0ToApplicationInsightFunction'
                 overrideParameters: >-
                   -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) -functionName $(functionName)
-
-
-
-            # - task: AzureAppServiceManage@0
-            #   displayName: 'Start FTPWatcher'
-            #   inputs:
-            #     azureSubscription: '${{ variables.subscription }}'
-            #     Action: 'Start Azure App Service'
-            #     WebAppName: '$(arm.workerFtpWatcherName)'
-            # - task: AzureAppServiceManage@0
-            #   displayName: 'Start Workflow Worker'
-            #   inputs:
-            #     azureSubscription: '${{ variables.subscription }}'
-            #     Action: 'Start Azure App Service'
-            #     WebAppName: '$(arm.workerForecastGasWorkFlowName)'
