@@ -27,7 +27,7 @@ stages:
       demands:
       - msbuild
       - visualstudio
-      - vstest
+      #- vstest
     variables:
       - group: Auth0ToApplicationInsight
       - name: NUGET_PACKAGES
@@ -87,7 +87,8 @@ stages:
        resourceGroupName: $(resourceGroup)
        location: '$(location)'
        templateLocation: 'Linked artifact'
-       csmFile: '$(workingDirectory)/ARM/Deploy.json'
+       csmFile: '$(Build.SourcesDirectory)/Services/Auth0toAI/ARM/Deploy.json'
+       #'$(workingDirectory)/ARM/Deploy.json'
        deploymentMode: 'Validation'
        deploymentName: 'Auth0ToApplicationInsightFunction'
        overrideParameters: >-
@@ -138,7 +139,8 @@ stages:
                 resourceGroupName: $(resourceGroup)
                 location: '$(location)'
                 templateLocation: 'Linked artifact'
-                csmFile: '$(workingDirectory)/ARM/Deploy.json'
+                csmFile: '$(Build.SourcesDirectory)/Services/Auth0toAI/ARM/Deploy.json'
+                #'$(workingDirectory)/ARM/Deploy.json'
                 deploymentMode: 'Validation'
                 deploymentName: 'Auth0ToApplicationInsightFunction'
                 overrideParameters: >-
