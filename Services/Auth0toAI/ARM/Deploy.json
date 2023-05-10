@@ -116,7 +116,7 @@
       "apiVersion": "2020-06-01",
       "name": "[parameters('eventGridSubscriptionName')]",
       "properties": {
-        "topic": "[concat('/subscriptions/', subscription().tenantId,'/resourceGroups/', resourceGroup().name,'/providers/Microsoft.EventGrid/partnerTopics/', parameters('eventGridTopicName'))]",
+        "topic": "[resourceId('Microsoft.EventGrid/partnerTopics/', parameters('eventGridTopicName'))]",
         "destination": {
           "endpointType": "AzureFunction",
           "properties": {
