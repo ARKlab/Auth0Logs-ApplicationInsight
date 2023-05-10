@@ -141,7 +141,7 @@ stages:
                 templateLocation: 'Linked artifact'
                 csmFile: '$(Build.SourcesDirectory)/Services/Auth0toAI/ARM/Deploy.json'
                 #'$(workingDirectory)/ARM/Deploy.json'
-                deploymentMode: 'Validation'
+                deploymentMode: 'Incremental'
                 deploymentName: 'Auth0ToApplicationInsightFunction'
                 overrideParameters: >-
                   -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) -functionName $(functionName)
