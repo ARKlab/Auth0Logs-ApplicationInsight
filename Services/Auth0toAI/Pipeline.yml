@@ -118,7 +118,7 @@ stages:
 
 - stage: 'Build_ARM_Stage' #Stage name cannot have spaces
   displayName: 'Validate ARM' #Name displayed when viewing in Azure DevOps
-  dependsOn: Build_Stage
+  dependsOn: ProdEnv_Stage
   jobs:
   - job: 'Build_Job' #Job name cannot have spaces
     displayName: 'ARM Validation' #Name displayed when viewing in Azure DevOps
