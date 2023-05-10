@@ -126,10 +126,10 @@
             "preferredBatchSizeInKilobytes": 64
           }
         },
-        "filter": {
-          "advancedFilters": [],
-          "enableAdvancedFilteringOnArrays": true
-        },
+        // "filter": {
+        //   "advancedFilters": [],
+        //   "enableAdvancedFilteringOnArrays": true
+        // },
         "labels": [],
         "eventDeliverySchema": "CloudEventSchemaV1_0"
       }
