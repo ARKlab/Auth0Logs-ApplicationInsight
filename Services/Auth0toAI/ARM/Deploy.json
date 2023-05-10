@@ -120,7 +120,8 @@
         "destination": {
           "endpointType": "AzureFunction",
           "properties": {
-            "resourceId": "[resourceId(concat('Microsoft.Web/sites/', variables('auth0ToApplicationInsightFunctionName')),'functions/', parameters('functionName'))]",
+            "resourceId": "[resourceId('Microsoft.Web/sites/functions/', variables('auth0ToApplicationInsightFunctionName'), parameters('functionName'))]",
+            //"[resourceId(concat('Microsoft.Web/sites/', variables('auth0ToApplicationInsightFunctionName')),'functions/', parameters('functionName'))]",
             "maxEventsPerBatch": 1,
             "preferredBatchSizeInKilobytes": 64
           }
