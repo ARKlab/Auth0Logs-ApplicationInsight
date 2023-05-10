@@ -78,21 +78,6 @@ stages:
        SymbolServerType: TeamServices
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact: drop'
-    - task: AzureResourceManagerTemplateDeployment@3
-      inputs:
-       deploymentScope: 'Resource Group'
-       azureResourceManagerConnection: '$(azureResurceManagerConnection)'
-       subscriptionId: '$(subscriptionId)'
-       action: 'Create Or Update Resource Group'
-       resourceGroupName: $(resourceGroup)
-       location: '$(location)'
-       templateLocation: 'Linked artifact'
-       csmFile: '$(Build.SourcesDirectory)/Services/Auth0toAI/ARM/Deploy.json'
-       #'$(workingDirectory)/ARM/Deploy.json'
-       deploymentMode: 'Validation'
-       deploymentName: 'Auth0ToApplicationInsightFunction'
-       overrideParameters: >-
-        -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) -functionName $(functionName)
 
 #- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
 #- ${{ if true }}:
@@ -130,18 +115,63 @@ stages:
                 appType: functionApp
                 appName: $(arm.auth0ToApplicationInsightFunctionName)
                 package: '$(Pipeline.Workspace)/drop/Auth0toAI/Auth0toAI.zip'
-            - task: AzureResourceManagerTemplateDeployment@3
-              inputs:
-                deploymentScope: 'Resource Group'
-                azureResourceManagerConnection: '$(azureResurceManagerConnection)'
-                subscriptionId: '$(subscriptionId)'
-                action: 'Create Or Update Resource Group'
-                resourceGroupName: $(resourceGroup)
-                location: '$(location)'
-                templateLocation: 'Linked artifact'
-                csmFile: '$(Build.SourcesDirectory)/Services/Auth0toAI/ARM/Deploy.json'
-                #'$(workingDirectory)/ARM/Deploy.json'
-                deploymentMode: 'Incremental'
-                deploymentName: 'Auth0ToApplicationInsightFunction'
-                overrideParameters: >-
-                  -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) -functionName $(functionName)
+
+- stage: 'Build_Stage' #Stage name cannot have spaces
+  displayName: 'Validate ARM' #Name displayed when viewing in Azure DevOps
+  jobs:
+  - job: 'Build_Job' #Job name cannot have spaces
+    displayName: 'ARM Validation' #Name displayed when viewing in Azure DevOps
+    variables:
+    - group: Auth0ToApplicationInsight
+    pool:
+      vmImage: $(vmImageName)
+    steps:           
+    - task: AzureResourceManagerTemplateDeployment@3
+      inputs:
+       deploymentScope: 'Resource Group'
+       azureResourceManagerConnection: '$(azureResurceManagerConnection)'
+       subscriptionId: '$(subscriptionId)'
+       action: 'Create Or Update Resource Group'
+       resourceGroupName: $(resourceGroup)
+       location: '$(location)'
+       templateLocation: 'Linked artifact'
+       csmFile: '$(Build.SourcesDirectory)/Services/Auth0toAI/ARM/Deploy.json'
+       #'$(workingDirectory)/ARM/Deploy.json'
+       deploymentMode: 'Validation'
+       deploymentName: 'Auth0ToApplicationInsightFunction'
+       overrideParameters: >-
+        -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) -functionName $(functionName)
+
+- stage: 'ProdEnv_Stage' #Stage name cannot have spaces
+  dependsOn:
+    - Build_Stage
+  displayName: 'InfrastructureDeploy' #Name displayed when viewing in Azure DevOps
+  #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+  variables:
+  - group: Auth0ToApplicationInsight
+  jobs:
+  - deployment: 'Deploy' #Job name cannot have spaces
+    displayName: 'Infrastructure' #Name displayed when viewing in Azure DevOps
+    pool:
+      vmImage: 'windows-2022'
+    environment: Auth0ToApplicationInsight
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+          - task: AzureResourceManagerTemplateDeployment@3
+            inputs:
+              deploymentScope: 'Resource Group'
+              azureResourceManagerConnection: '$(azureResurceManagerConnection)'
+              subscriptionId: '$(subscriptionId)'
+              action: 'Create Or Update Resource Group'
+              resourceGroupName: $(resourceGroup)
+              location: '$(location)'
+              templateLocation: 'Linked artifact'
+              csmFile: '$(Build.SourcesDirectory)/Services/Auth0toAI/ARM/Deploy.json'
+              #'$(workingDirectory)/ARM/Deploy.json'
+              deploymentMode: 'Incremental'
+              deploymentName: 'Auth0ToApplicationInsightFunction'
+              overrideParameters: >-
+                -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) -functionName $(functionName)
