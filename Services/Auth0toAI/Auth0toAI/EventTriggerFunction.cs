@@ -11,83 +11,89 @@ namespace Auth0toAI
     public class EventTriggerFunction
     {
         private Auth0Service _auth0Service;
-        private readonly ILogger _logger;
-        public EventTriggerFunction(Auth0Service auth0Service, ILoggerFactory loggerFactory) 
+
+        public EventTriggerFunction(Auth0Service auth0Service) 
         {
             _auth0Service = auth0Service;
-            _logger = loggerFactory.CreateLogger<EventTriggerFunction>();
         }
 
         [Function("EventTriggerFunction")]
-        public void Run([EventGridTrigger] CloudEvent cloudEvent)
+        public void Run([EventGridTrigger] MyEventType cloudEvent, FunctionContext context)
         {
-            _logger.LogDebug("Event received {type} {subject}", cloudEvent.Type, cloudEvent.Subject);
+            var _logger = context.GetLogger("EventTriggerFunction");
 
-            _logger.LogDebug("Event Data : {data}", cloudEvent.Data.ToString());
+            _logger.LogDebug("Event Data : {data} for cliend {client}", cloudEvent.Data["type"].ToString(), cloudEvent.Data["client_name"].ToString());
 
-            var dynamicRecord = JsonConvert.DeserializeObject<JObject>(cloudEvent.Data.ToString())!;
-
-            var logLevelType = MessageTypeHelper.LogConvertion(dynamicRecord["type"].ToString());
+            var logLevelType = MessageTypeHelper.LogConvertion(cloudEvent.Data["type"].ToString());
 
             var properties = new Dictionary<string, string>()
             {
-                { "_id", dynamicRecord["log_id"].ToString() },
-                { "client_id", dynamicRecord["client_id"].ToString() },
-                { "client_name", dynamicRecord["client_name"].ToString() },
-                { "date", dynamicRecord["date"].ToString() },
-                { "ip", dynamicRecord["ip"].ToString() },
-                { "log_id", dynamicRecord["log_id"].ToString() },
+                { "_id", cloudEvent.Data["log_id"].ToString() },
+                { "client_id", cloudEvent.Data["client_id"].ToString() },
+                { "client_name", cloudEvent.Data["client_name"].ToString() },
+                { "date", cloudEvent.Data["date"].ToString() },
+                { "ip", cloudEvent.Data["ip"].ToString() },
+                { "log_id", cloudEvent.Data["log_id"].ToString() },
                 { "type", logLevelType.nameLog },
-                { "type_code", dynamicRecord["type"].ToString() },
+                { "type_code", cloudEvent.Data["type"].ToString() },
             };
 
-            if(dynamicRecord.ContainsKey("hostname"))
+            if(cloudEvent.Data.ContainsKey("hostname"))
             {
-                properties.Add("auth0_domain", dynamicRecord["hostname"].ToString());
+                properties.Add("auth0_domain", cloudEvent.Data["hostname"].ToString());
             }
 
-            if (dynamicRecord.ContainsKey("audience"))
+            if (cloudEvent.Data.ContainsKey("audience"))
             {
-                properties.Add("audience", dynamicRecord["audience"].ToString());
+                properties.Add("audience", cloudEvent.Data["audience"].ToString());
             }
 
-            if (dynamicRecord.ContainsKey("description"))
+            if (cloudEvent.Data.ContainsKey("description"))
             {
-                properties.Add("description", dynamicRecord["description"].ToString());
+                properties.Add("description", cloudEvent.Data["description"].ToString());
             }
 
-            if (dynamicRecord.ContainsKey("user_agent"))
+            if (cloudEvent.Data.ContainsKey("user_agent"))
             {
-                properties.Add("user_agent", dynamicRecord["user_agent"].ToString());
+                properties.Add("user_agent", cloudEvent.Data["user_agent"].ToString());
             }
 
-            if(dynamicRecord.ContainsKey("scope"))
+            if(cloudEvent.Data.ContainsKey("scope") && cloudEvent.Data["scope"] != null)
             {
-                properties.Add("scope", dynamicRecord["scope"].ToString());
+                properties.Add("scope", cloudEvent.Data["scope"].ToString());
             }
 
-            if (dynamicRecord.ContainsKey("connection_id"))
+            if (cloudEvent.Data.ContainsKey("connection_id"))
             {
-                properties.Add("connection_id", dynamicRecord["connection_id"].ToString());
+                properties.Add("connection_id", cloudEvent.Data["connection_id"].ToString());
             }
 
-            if (dynamicRecord.ContainsKey("auth0_client"))
+            if (cloudEvent.Data.ContainsKey("auth0_client"))
             {
-                properties.Add("auth0_client", dynamicRecord["auth0_client"].ToString());
+                properties.Add("auth0_client", cloudEvent.Data["auth0_client"].ToString());
             }
 
-            if (dynamicRecord.ContainsKey("details"))
+            if (cloudEvent.Data.ContainsKey("details"))
             {
-                properties.Add("details", dynamicRecord["details"].ToString());
+                properties.Add("details", cloudEvent.Data["details"].ToString());
             }
 
             if ((int)logLevelType.levelLog >= 3)
             {
-                var error = new Exception(dynamicRecord["type"].ToString());
+                var error = new Exception(cloudEvent.Data["type"].ToString());
                 _auth0Service.TrackExceptionToApplicationInsight(error, properties);
             }
 
             _auth0Service.TrackEventToApplicationInsight(logLevelType.nameLog, properties: properties);
         }
+    }
+    public class MyEventType
+    {
+        public string Id { get; set; }
+        public string Topic { get; set; }
+        public string Subject { get; set; }
+        public string EventType { get; set; }
+        public DateTime EventTime { get; set; }
+        public IDictionary<string, object> Data { get; set; }
     }
 }
