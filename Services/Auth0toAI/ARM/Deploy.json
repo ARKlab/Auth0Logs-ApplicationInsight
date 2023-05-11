@@ -142,7 +142,7 @@
     {
       "type": "Microsoft.EventGrid/eventSubscriptions",
       "apiVersion": "2021-10-15-preview",
-      "name": "testtest1",
+      "name": "auth0-axpoit-P-BK1VpOIA",
       "properties": {
         "topic": "/subscriptions/4d02c00f-2f0b-4eda-8a58-9a42594c8a1f/resourceGroups/Auth0-Logs/providers/Microsoft.EventGrid/partnerTopics/auth0-axpoit-P-BK1VpOIA",
         "scope": "/subscriptions/4d02c00f-2f0b-4eda-8a58-9a42594c8a1f/resourceGroups/Auth0-Logs/providers/Microsoft.EventGrid/partnerTopics/auth0-axpoit-P-BK1VpOIA",
