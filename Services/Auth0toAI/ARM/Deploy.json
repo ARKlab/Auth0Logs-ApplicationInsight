@@ -140,7 +140,7 @@
     //   // ]
     // }
     {
-      "type": "Microsoft.EventGrid/partnerTopics/eventSubscriptions",
+      "type": "Microsoft.EventGrid/partnerTopics",
       "apiVersion": "2021-10-15-preview",
       "name": "auth0-axpoit-P-BK1VpOIA",
       "properties": {
