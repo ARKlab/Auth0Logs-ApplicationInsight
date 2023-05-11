@@ -13,11 +13,7 @@
     }
   },
   "variables": {
-    // "location": "[resourceGroup().location]",
     "shortName": "auth0toai",
-    // "projectName": "Auth0ToApplicationInsight",
-    // "storageAccountName": "[concat(variables('shortName'), 'sa')]",
-    // "applicationInsightsName": "[concat(variables('shortName'), '-', 'ai')]",
     "identityName": "[concat(variables('shortName'),'-', 'id')]",
     "identityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName'))]",
     "auth0ToApplicationInsightFunctionName": "[concat('Fx', '-Connector-', variables('shortName'))]"
@@ -101,7 +97,6 @@
           },
           "roles": {
             "value": [
-              // "Key Vault Secrets User",
               "Storage Account Queue Contributor",
               "Storage Account Blob Data Owner",
               "Storage Account Contributor",
@@ -111,47 +106,16 @@
         }
       }
     },
-    // {
-    //   "type": "Microsoft.EventGrid/eventSubscriptions",
-    //   "apiVersion": "2022-06-15",
-    //   "name": "[parameters('eventGridSubscriptionName')]",
-    //   "properties": {
-    //     //"topic": "[resourceId('Microsoft.EventGrid/partnerTopics/', parameters('eventGridTopicName'))]",
-    //     "topic": "[resourceId('Microsoft.EventGrid/partnerTopics/', parameters('eventGridTopicName'))]",
-    //     "destination": {
-    //       "endpointType": "AzureFunction",
-    //       "properties": {
-    //         "resourceId": "[resourceId('Microsoft.Web/sites/functions/', variables('auth0ToApplicationInsightFunctionName'), parameters('functionName'))]",
-    //         //"[resourceId(concat('Microsoft.Web/sites/', variables('auth0ToApplicationInsightFunctionName')),'functions/', parameters('functionName'))]",
-    //         "maxEventsPerBatch": 1,
-    //         "preferredBatchSizeInKilobytes": 64
-    //       }
-    //     },
-    //     "filter": {
-    //       "advancedFilters": [],
-    //       "enableAdvancedFilteringOnArrays": true
-    //     },
-    //     "labels": [],
-    //     "eventDeliverySchema": "CloudEventSchemaV1_0"
-    //   }
-    //   //,
-    //   // "dependsOn": [
-    //   //     "[resourceId('Microsoft.EventGrid/partnerTopics', parameters('eventGridTopicName'))]"
-    //   // ]
-    // }
     {
       "type": "Microsoft.EventGrid/partnerTopics/eventSubscriptions",
       "apiVersion": "2022-06-15",
-      "name": "[concat(parameters('eventGridTopicName'), '/', parameters('eventGridSubscriptionName'))]",//"auth0-axpoit-P-BK1VpOIA/EventGridTest",
+      "name": "[concat(parameters('eventGridTopicName'), '/', parameters('eventGridSubscriptionName'))]",
       "properties": {
         "topic": "[resourceId('Microsoft.EventGrid/partnerTopics/', parameters('eventGridTopicName'))]",
-        //"/subscriptions/4d02c00f-2f0b-4eda-8a58-9a42594c8a1f/resourceGroups/Auth0-Logs/providers/Microsoft.EventGrid/partnerTopics/auth0-axpoit-P-BK1VpOIA",
-        //"scope": "/subscriptions/4d02c00f-2f0b-4eda-8a58-9a42594c8a1f/resourceGroups/Auth0-Logs/providers/Microsoft.EventGrid/partnerTopics/auth0-axpoit-P-BK1VpOIA",
         "destination": {
           "endpointType": "AzureFunction",
           "properties": {
             "resourceId": "[resourceId('Microsoft.Web/sites/functions/', variables('auth0ToApplicationInsightFunctionName'), parameters('functionName'))]",
-            //"/subscriptions/4d02c00f-2f0b-4eda-8a58-9a42594c8a1f/resourceGroups/Auth0-Logs/providers/Microsoft.Web/sites/Fx-Connector-auth0toai/functions/EventTriggerFunction",
             "maxEventsPerBatch": 1,
             "preferredBatchSizeInKilobytes": 64
           }
