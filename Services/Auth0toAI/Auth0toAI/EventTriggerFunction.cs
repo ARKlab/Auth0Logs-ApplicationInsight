@@ -1,8 +1,5 @@
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Azure.Messaging;
 using Auth0toAI.Common;
-using Newtonsoft.Json.Linq;
 using Auth0toAI.Service;
 using Microsoft.Azure.Functions.Worker;
 
