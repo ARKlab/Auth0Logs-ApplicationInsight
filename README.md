@@ -1,5 +1,5 @@
 # Auth0Logs-ApplicationInsight
-This azure function, written in .Net C#, is usefull to receive **Event Grid Events** from **Auth0** (once the Event Grid it is created), transform them and sent to an **ApplicationInsight**.
+This project is containing an azure function, written in .Net C# and the related pipeline.yml and deploy.json to create pipeline in DevOps and deploy the needed infrastructure in Azure environment. The azure function is usefull to receive **Event Grid Events** from **Auth0** (once the Event Grid it is created), and send the events to an **ApplicationInsight**.
 
 # Create Event Grid resources on Azure:
 To create **Event Grid Partner Configuration** and **Event Grid Partner Topic** with **Auth0** subscription, follow the steps in the Microsoft Guide link below:
@@ -11,7 +11,7 @@ https://learn.microsoft.com/en-us/azure/event-grid/auth0-how-to#authorize-partne
 
 # Step to use the project:
 Download this project where are included 3 main components:
-- Infrastructure\Pipeline.yml: It is used to create Azure infrastructure pipeline in your devops environment. Need to be imported to the Azure DevOps and set the following variables in the Library with variable group name **Auth0ToApplicationInsight**:
+- Infrastructure\Pipeline.yml: It is used to create Azure infrastructure pipeline in your DevOps environment. Need to be imported to the Azure DevOps and set the following variables in the Library with variable group name **Auth0ToApplicationInsight**:
 
   | Variable Name | Value |
   | ------------- | ----- |
@@ -29,7 +29,7 @@ Set **azureResurceManagerConnection** variable in the pipeline variable (not in 
   | ------------- | ----- |
   | azureResurceManagerConnection | Service connection name |
 
-- Infrastructure\ARM\Deploy.json: It is the ARM template used to deploy all the resources in the Azure Portal (**Event Subscription** in the **Event Grid Partner Topic**), Application Service Plan, Function App (for the Azure Function), Application Insight to deploy custom events.
-- Auth0LogEventGridFunction project it is the Function to be deployed in the **Azure Function** (Function App) that will be the **Event Grid Event Handler** subscribed to the **Event Grid Events** that will manage the Events from Auth0 and send them to **Application Insight** as 'Custom Events'
-- Services\Auth0toAI\Pipeline.yml: This pipeline is building the service and deploying it in the Azure function app created with Infrastructure\ARM\Deploy.json
-- Service\Auth0toAI\ARM\Deploy.json: This Deploy.json is creating the Event Grid Parner Topic Subscription and subscribing the Azure Function previously deployed, to it
+- Infrastructure\ARM\Deploy.json: It is the ARM template used to deploy all the resources in the Azure Portal, Application Service Plan, Function App (for the Azure Function), Application Insight to deploy custom events.
+- Auth0LogEventGridFunction project it is the Function to be deployed in the **Azure Function** (Function App) that will be the **Event Grid Event Handler** subscribed to the **Event Grid Events** that will manage the Events from Auth0 and send them to **Application Insight**.
+- Services\Auth0toAI\Pipeline.yml: This pipeline is building the azure function and deploying it in the Azure function app created with Infrastructure\ARM\Deploy.json.
+- Service\Auth0toAI\ARM\Deploy.json: This Deploy.json is creating the **Event Subscription** in the **Event Grid Partner Topic** and subscribing the Azure Function previously deployed, to it.
