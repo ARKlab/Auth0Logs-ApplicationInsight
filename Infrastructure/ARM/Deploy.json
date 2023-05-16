@@ -19,6 +19,7 @@
     "uniqueNameForSA": "[toLower(concat(variables('shortName'), parameters('uniquePrefixName')))]",
     "projectName": "Auth0ToApplicationInsight",
     "storageAccountName": "[concat(variables('uniqueNameForSA'), 'sa')]",
+    "keyVaultName": "[concat(variables('uniqueName'), '-kv')]",
     "applicationInsightsName": "[concat(variables('uniqueName'), '-', 'ai')]",
     "identityName": "[concat(variables('uniqueName'), '-', 'id')]",
     "identityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName'))]",
@@ -160,7 +161,7 @@
         {
             "type": "Microsoft.KeyVault/vaults",
             "apiVersion": "2022-07-01",
-            "name": "[concat(variables('shortName'), '-kv')]",
+            "name": "[variables('keyVaultName')]",
             "location": "[variables('location')]",
             "properties": {
                 "enabledForDeployment": true,
@@ -184,7 +185,7 @@
                         "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value,';EndpointSuffix=','core.windows.net')]"
                     },
                     "dependsOn": [
-                        "[resourceId('Microsoft.KeyVault/vaults', concat(variables('shortName'), '-kv'))]"
+                        "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
                     ]
                 }
             ],
@@ -217,7 +218,7 @@
                 "userAssignedIdentities": { "[variables('identityId')]": {} }
             },
           "dependsOn": [
-            "[concat('Microsoft.KeyVault/vaults/', variables('shortName'), '-kv', '/secrets/ConnectionStrings--Auth0ToAI-Storage')]",
+            "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'), '/secrets/ConnectionStrings--Auth0ToAI-Storage')]",
             "[resourceId('Microsoft.Web/serverfarms', concat(parameters('uniquePrefixName'), '-', variables('projectName'), '-', 'ASP'))]",
             "[variables('identityId')]"
           ],
@@ -251,7 +252,7 @@
                     "AzureWebJobsStorage__credential":"managedidentity",
                     "FUNCTIONS_EXTENSION_VERSION": "~4",
                     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-                    "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', concat(variables('shortName'), '-kv'), 'ConnectionStrings--Auth0ToAI-Storage')).secretUri, ')')]",
+                    "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ConnectionStrings--Auth0ToAI-Storage')).secretUri, ')')]",
                     "WEBSITE_CONTENTSHARE": "[concat(variables('shortName'), 'sha')]",
                     "WEBSITE_RUN_FROM_PACKAGE": "1"
                   }
