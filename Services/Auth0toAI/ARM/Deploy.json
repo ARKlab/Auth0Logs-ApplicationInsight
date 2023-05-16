@@ -2,6 +2,9 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "uniquePrefixName": {
+        "type": "string"
+    },
     "eventGridTopicName": {
       "type": "string"
     },
@@ -14,9 +17,10 @@
   },
   "variables": {
     "shortName": "auth0toai",
-    "identityName": "[concat(variables('shortName'),'-', 'id')]",
+    "uniqueName": "[toLower(concat(variables('shortName'), '-', parameters('uniquePrefixName')))]",
+    "identityName": "[concat(variables('uniqueName'), '-', 'id')]",
     "identityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName'))]",
-    "auth0ToApplicationInsightFunctionName": "[concat('Fx', '-Connector-', variables('shortName'))]"
+    "auth0ToApplicationInsightFunctionName": "[concat('Fx-', variables('uniqueName'))]"
   },
   "resources": [
     {

@@ -15,12 +15,14 @@
   "variables": {
     "location": "[resourceGroup().location]",
     "shortName": "auth0toai",
+    "uniqueName": "[toLower(concat(variables('shortName'), '-', parameters('uniquePrefixName')))]",
+    "uniqueNameForSA": "[toLower(concat(variables('shortName'), parameters('uniquePrefixName')))]",
     "projectName": "Auth0ToApplicationInsight",
-    "storageAccountName": "[concat(variables('shortName'), 'sa')]",
-    "applicationInsightsName": "[concat(variables('shortName'), '-', 'ai')]",
-    "identityName": "[concat(variables('shortName'),'-', 'id')]",
+    "storageAccountName": "[concat(variables('uniqueNameForSA'), 'sa')]",
+    "applicationInsightsName": "[concat(variables('uniqueName'), '-', 'ai')]",
+    "identityName": "[concat(variables('uniqueName'), '-', 'id')]",
     "identityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName'))]",
-    "auth0ToApplicationInsightFunctionName": "[concat('Fx', '-Connector-', variables('shortName'))]"
+    "auth0ToApplicationInsightFunctionName": "[concat('Fx-', variables('uniqueName'))]"
   },
     "resources": [
         {
