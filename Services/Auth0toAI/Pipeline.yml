@@ -139,7 +139,7 @@ stages:
        deploymentMode: 'Validation'
        deploymentName: 'Auth0ToApplicationInsightFunction'
        overrideParameters: >-
-        -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) -functionName $(functionName)
+        -uniquePrefixName $(uniquePrefixName) -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) -functionName $(functionName)
 
 - stage: 'ProdEnv_ARM_Stage' #Stage name cannot have spaces
   dependsOn:
@@ -172,4 +172,4 @@ stages:
               deploymentMode: 'Incremental'
               deploymentName: 'Auth0ToApplicationInsightFunction'
               overrideParameters: >-
-                -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) -functionName $(functionName)
+                -uniquePrefixName $(uniquePrefixName) -eventGridTopicName $(eventGridTopicName) -eventGridSubscriptionName $(eventGridSubscriptionName) -functionName $(functionName)
