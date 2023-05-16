@@ -17,7 +17,7 @@
     "shortName": "auth0toai",
     "uniqueName": "[toLower(concat(variables('shortName'), '-', parameters('uniquePrefixName')))]",
     "projectName": "Auth0ToApplicationInsight",
-    "storageAccountName": "[concat(variables('uniqueName'), '-', 'sa')]",
+    "storageAccountName": "[concat(variables('uniqueName'), 'sa')]",
     "applicationInsightsName": "[concat(variables('uniqueName'), '-', 'ai')]",
     "identityName": "[concat(variables('uniqueName'), '-', 'id')]",
     "identityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName'))]",
