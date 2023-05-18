@@ -55,7 +55,12 @@ namespace Auth0toAI
                 properties.Add("user_agent", cloudEvent.Data["user_agent"].ToString());
             }
 
-            if(cloudEvent.Data.ContainsKey("scope") && cloudEvent.Data["scope"] != null)
+            if (cloudEvent.Data.ContainsKey("user_id"))
+            {
+                properties.Add("user_id", cloudEvent.Data["user_id"].ToString());
+            }
+
+            if (cloudEvent.Data.ContainsKey("scope") && cloudEvent.Data["scope"] != null)
             {
                 properties.Add("scope", cloudEvent.Data["scope"].ToString());
             }
