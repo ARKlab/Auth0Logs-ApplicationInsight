@@ -21,6 +21,16 @@ namespace Auth0toAI.Service
 
         public void TrackEventToApplicationInsight(string name, Dictionary<string, string> properties)
         {
+            if (properties.TryGetValue("user_id", out var userId))
+            {
+                _telemetryClient.Context.User.Id = userId;
+            }
+
+            if (properties.TryGetValue("ip", out var ip))
+            {
+                _telemetryClient.Context.Location.Ip = ip;
+            }
+
             _telemetryClient.TrackEvent(name, properties);
         }
 
